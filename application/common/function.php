@@ -423,3 +423,77 @@ function import_excel($data=[], $title=[], $filename='file') {
 function directory($dir) {
     return  is_dir($dir) or directory(dirname($dir)) && mkdir($dir, 0775);
 }
+
+/**
+ * 无限极分类，递归查询某分类的子分类
+ * @param $category
+ * @param int $id
+ * @return array
+ */
+function get_subs($category, $id=0) {
+    $subs = [];
+    foreach ($category as $key => $item) {
+        if ($item['pid'] == $id) {
+            $subs[] = $item;
+            unset($category[$key]);
+            $subs = array_merge($subs, get_subs($category, $item['id']));
+        }
+    }
+    return $subs;
+}
+
+/**
+ * 无限极分类，生成树（引用）
+ * @param $list
+ * @param int $root
+ */
+function generate_tree($list, $root=0) {
+    $tree = [];
+    $list = array_column($list, null, 'id');
+    foreach ($list as $key => $value) {
+        if ($root == $value['pid']) {
+            $tree[] = &$list[$key];
+        } else {
+            $list[$value['pid']]['son'][] = &$list[$key];
+        }
+    }
+}
+
+/**
+ * 无限极分类，递归生成树
+ * @param $list
+ * @param int $pid
+ * @return array
+ */
+function generate_tree2($list, $pid = 0) {
+    $tree = [];
+    foreach ($list as $val) {
+        if ($val['pid'] == $pid) {
+            $tree[] = [
+                'id'   => $val['id'],
+                'name' => $val['name'],
+                'pid'  => $val['pid'],
+                'son'  => generate_tree2($list, $val['id'])
+            ];
+        }
+    }
+    return $tree;
+}
+
+/**
+ * 二维数组根据某字段去重
+ * @param $arr
+ * @param null $key
+ * @return mixed
+ */
+function two_dim_array_unique($arr, $key=null) {
+    $temp_arr = [];
+    foreach($arr as $k => $val) {
+        if (!in_array($val[$key], $temp_arr)) {
+            unset($arr[$k]);
+        } else {
+            $temp_arr[] = $val[$key];
+        }
+    }
+    return $arr;
+}
