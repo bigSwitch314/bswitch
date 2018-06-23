@@ -11,6 +11,8 @@
 
 // [ 应用入口文件 ]
 
+// 记录执行到入口时间
+$GLOBALS['index_start_time'] = microtime();
 // 定义应用目录
 define('APP_PATH', __DIR__ . '/application/');
 // 定义配置文件目录

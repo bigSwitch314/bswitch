@@ -497,3 +497,45 @@ function two_dim_array_unique($arr, $key=null) {
     }
     return $arr;
 }
+
+/**
+ * 获取请求参数
+ * @return string
+ */
+function get_params()
+{
+    $params = "";
+    $inputs = $_REQUEST;
+    ksort($inputs, SORT_STRING);
+    foreach ($inputs as $key=>$value) {
+        if ($key=="op") continue;
+
+        if (empty($params)) {
+            if (is_array($value)) {
+                $params_value = implode(",", $value);
+            } else {
+                $params_value = $value;
+            }
+            $params = "{$key}={$params_value}";
+        } else {
+            if (is_array($value)) {
+                $params_value = implode(",", $value);
+            }else{
+                $params_value = $value;
+            }
+            $params = "{$params}\t{$key}={$params_value}\t";
+        }
+    }
+    return $params;
+}
+
+/**
+ * 获取当前微秒时间
+ * @return string
+ */
+function  get_microtime()
+{
+    $time = microtime();
+    $arr  = explode(" ", $time);
+    return sprintf("%d%06d", $arr[1], $arr[0] * 1000000);
+}

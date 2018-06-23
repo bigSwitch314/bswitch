@@ -22,7 +22,7 @@ class RedisClient
     }
 
     /**
-     * 实例化类，单例模式
+     * 实例化类
      * @param $configs
      * @return RedisClient|bool|null
      */
