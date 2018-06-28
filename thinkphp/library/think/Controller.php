@@ -259,7 +259,9 @@ class Controller
 
         $arr2       = explode(" ", microtime());
         $end_time   = sprintf("%d%06d", $arr2[1], $arr2[0] * 1000000);
-        $diff       = ($end_time - $start_time) / 1000000;
+        $use_time   = ($end_time - $start_time) / 1000000;
+        // 使用内存
+        $use_memory = round(memory_get_peak_usage() / 1024) . 'kb';
         // 返回对应的数据类型
         if (empty($type)) {
             $type = Config::get('default_return_type');
@@ -268,8 +270,8 @@ class Controller
             // 返回json数据格式
             case 'JSON' :
                 $data = (object)$data;
-                $str  = sprintf( "module=%s\tcontroller=%s\taction=%s\tuse_time=%s\t%s\terrcode=%s\terrmsg=%s",
-                    $this->request->module(), $this->request->controller(), $this->request->action(), $diff, get_params(), $data->errcode, $data->errmsg);
+                $str  = sprintf("module=%s\tcontroller=%s\taction=%s\tuse_time=%s\tuse_memory=%s\t%s\terrcode=%s\terrmsg=%s",
+                    $this->request->module(), $this->request->controller(), $this->request->action(), $use_time, $use_memory, get_params(), $data->errcode, $data->errmsg);
                 if (isset($data->log)) {
                     $str = $str . $data->log;
                     unset($data->log);

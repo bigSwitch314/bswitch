@@ -22,10 +22,59 @@ function get_env($key='ENV') {
 }
 
 /**
- * 记录日志
+ * 获取客户端IP
  * @return bool
  */
-function logw() {
+function get_real_ip()
+{
+    static $ip = false;
+    if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
+        $ip = $_SERVER["HTTP_CLIENT_IP"];
+    }
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        if ($ip) {
+            array_unshift($ips, $ip);
+            $ip = FALSE;
+        }
+        for ($i = 0; $i < count($ips); $i++) {
+            if (method_exists('eregi') && !eregi ("^(10|172\.16|192\.168)\.", $ips[$i])) {
+                $ip = $ips[$i];
+                break;
+            }
+        }
+    }
+    $ip = $ip ? $ip : $_SERVER['REMOTE_ADDR'];
+    return $ip;
+}
+
+/**
+ * 记录日志
+ * @param $msg
+ * @param string $file_name
+ * @return bool
+ */
+function logw($msg, $file_name='info') {
+    $log_file = sprintf("/mnt/%s/log/bs-%s.%s.log", get_env('ENV'), $file_name, date('Y-m-d', strtotime('today')));
+    // 判断日志大小
+    $log_size = Config::get('log_size') ?: 100 * 1024 * 1024;
+    if (file_exists($log_file) && filesize($log_file) > $log_size) {
+        $str = date('Y-m-d', strtotime('today')) . '-' . time();
+        $new_name = sprintf("/mnt/%s/log/qn-%s.%s.log", Config::get("ENV"), $file_name, $str);
+        rename($log_file, $new_name);
+    }
+    // 创建目录
+    if (false === directory(dirname($log_file))) {
+        exit('日志目录创建失败！');
+    }
+    $host_name = phpversion() < "5.3.0" ? $_SERVER['HOSTNAME'] : gethostname();
+    $ip = get_real_ip();
+    // 写日志
+    $content = sprintf("%s\tip=%s\t%s\thostname=%s\n", date("H:i:s"), $ip, $msg, $host_name);
+    $fp = fopen($log_file, 'a');
+    fwrite($fp, $content);
+    fclose($fp);
+
     return true;
 }
 
@@ -523,7 +572,7 @@ function get_params()
             }else{
                 $params_value = $value;
             }
-            $params = "{$params}\t{$key}={$params_value}\t";
+            $params = "{$params}\t{$key}={$params_value}";
         }
     }
     return $params;

@@ -10,7 +10,8 @@ class Index extends Common
     {
         try {
             $param = $this->param;
-            //dump($param);
+
+            $config = Config::get('template_msg.pt_card_template_id');
 
             $data  = json_encode_unescape($param);
 
