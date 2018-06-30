@@ -11,8 +11,10 @@
 
 // [ 应用入口文件 ]
 
-// 记录执行到入口时间
+// 记录执行到入口文件时间
 $GLOBALS['index_start_time'] = microtime();
+// 设置报错类型
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 // 定义应用目录
 define('APP_PATH', __DIR__ . '/application/');
 // 定义配置文件目录

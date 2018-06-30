@@ -37,7 +37,7 @@ return [
     // 应用调试模式
     'app_debug'              => true,
     // 应用Trace
-    'app_trace'              => false,
+    'app_trace'              => true,
     // 应用模式状态
     'app_status'             => '',
     // 是否支持多模块
@@ -144,12 +144,14 @@ return [
     // +----------------------------------------------------------------------
 
     'log'                    => [
-        // 日志记录方式，内置 file socket 支持扩展
+        // 日志记录方式，内置file socket支持扩展
         'type'  => 'File',
         // 日志保存目录
         'path'  => LOG_PATH,
         // 日志记录级别
         'level' => [],
+        // 日志大小
+        'size'  => 56200000
     ],
 
     // +----------------------------------------------------------------------
@@ -212,19 +214,20 @@ return [
     'encode_key' => 'webHttpFrameWork@2016#!Fuck Me',
     // redis记录发送短信验证码过期时间,10min
     'sms_code_expire' => '600',
+
     // redis配置
     'redis_conf' => [
         'master' => [
             [
-                'host' => '172.18.5.46',
-                'auth' => 'gZJfGZq7iS',
+                'host' => '127.0.0.1',
+                'auth' => 'lq420684',
                 'port' => 6379
             ],
         ],
         'slave' => [
             [
-                'host' => '172.18.5.46',
-                'auth' => 'gZJfGZq7iS',
+                'host' => '127.0.0.1',
+                'auth' => 'lq420684',
                 'port' => 6379
             ],
         ],

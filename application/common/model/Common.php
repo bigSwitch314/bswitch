@@ -13,14 +13,6 @@ use think\model;
 class Common extends model
 {
     /**
-     * Common constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * 查询单条记录
      * @param array $where
      * @param array $fields

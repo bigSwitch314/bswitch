@@ -2488,7 +2488,7 @@ class Query
         }
 
         // 数据列表读取后的处理
-        if (!empty($this->model)) {
+        if (!empty($this->model) && 'collection' == $this->connection->getConfig('resultset_type')) {
             // 生成模型对象
             if (count($resultSet) > 0) {
                 foreach ($resultSet as $key => $result) {
@@ -2515,10 +2515,11 @@ class Query
             } else {
                 $resultSet = $this->model->toCollection($resultSet);
             }
-        } elseif ('collection' == $this->connection->getConfig('resultset_type')) {
+        } elseif (empty($this->model) && 'collection' == $this->connection->getConfig('resultset_type')) {
             // 返回Collection对象
             $resultSet = new Collection($resultSet);
         }
+
         // 返回结果处理
         if (!empty($options['fail']) && count($resultSet) == 0) {
             $this->throwNotFound($options);
@@ -2653,7 +2654,7 @@ class Query
 
         // 数据处理
         if (!empty($result)) {
-            if (!empty($this->model)) {
+            if (!empty($this->model) && 'collection' == $this->connection->getConfig('resultset_type')) {
                 // 返回模型对象
                 $result = $this->model->newInstance($result);
                 $result->isUpdate(true, isset($options['where']['AND']) ? $options['where']['AND'] : null);
