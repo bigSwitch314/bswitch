@@ -53,8 +53,8 @@ class Index extends Common
 
         try {
             $param = $this->param;
-            echo $qq;die;
             $redis = new RedisClient();
+            //dump($redis);die;
             $res = $redis->get('name');
             dump($res);die;
 
@@ -85,8 +85,8 @@ class Index extends Common
             //$map['phone'] = 18203004644;
             $fields = 'user_id, username, phone';
             //$fields = '*';
-            $result = $UserBusModel->getOneData($map, $fields);
-            $result = Db::table('rb_user_bus')->where($map)->field($fields)->select();
+            $result = $UserBusModel->getMultiData($map, $fields, 'user_id');
+            //$result = Db::table('rb_user_bus')->where($map)->field($fields)->select();
             //dump($UserBusModel::$links);die;
 
             //$reflect = new \ReflectionObject($UserBusModel);
@@ -94,13 +94,13 @@ class Index extends Common
             //dump($reflect->getProperties());
             //dump($reflect->getMethods());
             //die;
-            dump($result);die;
+
 
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
                 'errmsg'  => '获取成功!',
-                'data'    => $data,
+                'data'    => $result
             ]);
 
         } catch (\Exception $e) {
@@ -134,8 +134,36 @@ class Index extends Common
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
-                'errmsg'  => '获取成功!',
-                'data'    => $data,
+                'errmsg'  => '获取成功!'
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * session测试
+     */
+    public function session()
+    {
+        try {
+            dump(session_start());
+            dump(session_status());
+            dump(session_name());
+            dump(session_id());
+            dump($_COOKIE[session_name()]);
+            $_SESSION['name'] = 'luoqiang';
+            dump($_SESSION['name']);
+            dump(session_save_path());
+
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!'
             ]);
 
         } catch (\Exception $e) {

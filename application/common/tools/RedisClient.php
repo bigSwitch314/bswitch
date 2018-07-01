@@ -45,7 +45,7 @@ class RedisClient
      */
     public function getRedis($key=null, $tag='master')
     {
-        if (!self::$link_handle[$tag]) {
+        if (self::$link_handle[$tag]) {
             return self::$link_handle[$tag];
         }
 
