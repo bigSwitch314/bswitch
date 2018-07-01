@@ -188,6 +188,41 @@ function json_decode_escape($json) {
 }
 
 /**
+ * 获取微妙时间
+ * @param string $time
+ * @return string
+ */
+function  get_microtime($time = '')
+{
+    $time = $time ?: microtime();
+    $arr  = explode(" ", $time);
+    return sprintf("%d%06d", $arr[1], $arr[0] * 1000000);
+}
+
+/**
+ * 其他单位转换为字节
+ * @param $other
+ * @return int
+ */
+function other2byte ($other) {
+    $uint = strtoupper(substr(trim($other), -1));
+    switch ($uint) {
+        case 'K':
+            $byte = intval($other) * pow(1024, 1);
+            break;
+        case 'M':
+            $byte = intval($other) * pow(1024, 2);
+            break;
+        case 'G':
+            $byte = intval($other) * pow(1024, 3);
+            break;
+        default:
+            $byte = $other;
+    }
+    return $byte;
+}
+
+/**
  * 二维数组分组
  * @param $arr
  * @param array $key
@@ -576,15 +611,4 @@ function get_params()
         }
     }
     return $params;
-}
-
-/**
- * 获取当前微秒时间
- * @return string
- */
-function  get_microtime()
-{
-    $time = microtime();
-    $arr  = explode(" ", $time);
-    return sprintf("%d%06d", $arr[1], $arr[0] * 1000000);
 }

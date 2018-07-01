@@ -82,11 +82,11 @@ class Index extends Common
         try {
             $UserBusModel = new UserBusModel();  //dump($UserBusModel);die;
             $map['bus_id'] = 1;
-            $map['phone'] = 18203004644;
+            //$map['phone'] = 18203004644;
             $fields = 'user_id, username, phone';
             //$fields = '*';
             $result = $UserBusModel->getOneData($map, $fields);
-            //$result = Db::table('rb_user_bus')->where($map)->field($fields)->select();
+            $result = Db::table('rb_user_bus')->where($map)->field($fields)->select();
             //dump($UserBusModel::$links);die;
 
             //$reflect = new \ReflectionObject($UserBusModel);
@@ -94,8 +94,42 @@ class Index extends Common
             //dump($reflect->getProperties());
             //dump($reflect->getMethods());
             //die;
-
             dump($result);die;
+
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data,
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * log测试
+     */
+    public function log()
+    {
+        try {
+
+            str_repeat("采用PHP函数memory_get_usage获取PHP内存清耗量的方法", 2000000);
+
+            $memory_limit = (ini_get('memory_limit'));
+            $memory_limit = other2byte($memory_limit);
+
+            $memory_use     = memory_get_peak_usage(true);
+            $memory_percent = (string)round(($memory_use / $memory_limit), 4) * 100 . '%';
+
+            $memory_use     = (string)round($memory_use / pow(1024, 2), 2) . 'mb';
+            $memory_limit   = (string)round($memory_limit / pow(1024, 2), 2) . 'mb';
+
+            $memory_stat  = $memory_limit . '_' . $memory_use . '_' . $memory_percent;
 
 
             $this->ajaxReturn([
