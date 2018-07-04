@@ -176,6 +176,16 @@ class RedisClient
     }
 
     /**
+     * 选择数据库
+     * @param int $db
+     * @return array
+     */
+    public function select($db = 0)
+    {
+        return $this->getRedis(null, 'slave')->keys($db);
+    }
+
+    /**
      * 重命名key
      * @param $oldkey
      * @param $newkey

@@ -175,14 +175,22 @@ return [
 
     'session'                => [
         'id'             => '',
-        // SESSION_ID的提交变量,解决flash上传跨域
+        // SESSION_ID的提交变量，解决flash上传跨域
         'var_session_id' => '',
-        // SESSION 前缀
+        // SESSION前缀
         'prefix'         => 'think',
-        // 驱动方式 支持redis memcache memcached
-        'type'           => '',
-        // 是否自动开启 SESSION
+        // 是否自动开启SESSION
         'auto_start'     => true,
+        // sessionkey前缀
+        'session_name'   => 'sess_',
+        // 驱动方式支持redis、memcache、memcached
+        'type'           => 'redis',
+        // redis主机
+        'host'           => '127.0.0.1',
+        // redis密码
+        'password'       => 'lq420684',
+        // redis端口
+        'port'           => 6379
     ],
 
     // +----------------------------------------------------------------------

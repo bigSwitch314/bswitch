@@ -7,6 +7,7 @@ use app\common\tools\RedisClient;
 use app\common\model\UserBus as UserBusModel;
 use think\Config;
 use think\Db;
+use think\Session;
 
 class Index extends Common
 {
@@ -54,8 +55,8 @@ class Index extends Common
         try {
             $param = $this->param;
             $redis = new RedisClient();
-            //dump($redis);die;
-            $res = $redis->get('name');
+            $redis->set('home', 'chongqing');
+            $res = $redis->get('home');
             dump($res);die;
 
             $data  = json_encode_unescape($param);
@@ -151,15 +152,23 @@ class Index extends Common
     public function session()
     {
         try {
-            dump(session_start());
-            dump(session_status());
-            dump(session_name());
-            dump(session_id());
-            dump($_COOKIE[session_name()]);
-            $_SESSION['name'] = 'luoqiang';
-            dump($_SESSION['name']);
-            dump(session_save_path());
+//            ini_set('session.save_handler','redis');
+//            ini_set('session.save_path','tcp://127.0.0.1:6379');
+//            session_start();
+//            $_SESSION['name2'] = 'luoqiang2';
+//            dump($_SESSION['name2']);
+//            dump(session_id());
 
+            $redis = new RedisClient();
+
+            $res = $redis->keys('*');
+            dump($res);
+
+            Session::set('book', 'mysql22');
+            echo Session::get('book');
+            dump(session_id());
+
+            die;
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
