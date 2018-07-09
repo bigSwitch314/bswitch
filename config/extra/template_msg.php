@@ -5,7 +5,7 @@
 
 use think\Env;
 
-$env = Env::get('ENV');
+$env = Env::get('env');
 $env = in_array($env, ['dev', 'beta', 'sim', 'online']) ? $env : 'dev';
 
 $template_conf = [

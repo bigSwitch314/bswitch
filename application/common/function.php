@@ -8,15 +8,16 @@
 
 use think\Env;
 use think\Config;
+use app\common\tools\RedisClient;
 
 /**
  * 获取环境变量
  * @param string $key
  * @return mixed|string
  */
-function get_env($key='ENV') {
+function get_env($key='env') {
     $value = Env::get($key);
-    if ('ENV' === $key)
+    if ('env' === $key)
         return in_array($value, ['dev', 'beta', 'sim', 'online']) ? $value : 'dev';
     return $value;
 }
@@ -52,19 +53,21 @@ function get_real_ip()
  * 记录日志
  * @param $msg
  * @param string $file_name
+ * @param bool $socket_log
  * @return bool
  */
-function logw($msg, $file_name='info') {
-    $log_file = sprintf("/mnt/%s/log/bs-%s.%s.log", get_env('ENV'), $file_name, date('Y-m-d', strtotime('today')));
+function logw($msg, $file_name ='info', $socket_log=false) {
+    $log_file = sprintf("/mnt/%s/log/%s/bs-%s.%s.log", get_env('env'), date('Ym'), $file_name, date('Y-m-d'));
     // 判断日志大小
     $log_size = Config::get('log_size') ?: 100 * 1024 * 1024;
     if (file_exists($log_file) && filesize($log_file) > $log_size) {
         $str = date('Y-m-d', strtotime('today')) . '-' . time();
-        $new_name = sprintf("/mnt/%s/log/qn-%s.%s.log", Config::get("ENV"), $file_name, $str);
+        $new_name = sprintf("/mnt/%s/log/%s/bs-%s.%s.log", Config::get("env"), date('Ym'), $file_name, $str);
         rename($log_file, $new_name);
     }
     // 创建目录
-    if (false === directory(dirname($log_file))) {
+    $dir = dirname($log_file);
+    if (!is_dir($dir) && false === mark_directory($dir)) {
         exit('日志目录创建失败！');
     }
     $host_name = phpversion() < "5.3.0" ? $_SERVER['HOSTNAME'] : gethostname();
@@ -74,8 +77,26 @@ function logw($msg, $file_name='info') {
     $fp = fopen($log_file, 'a');
     fwrite($fp, $content);
     fclose($fp);
+    // Socket远程调试
+    if ($socket_log) { // 将日志存入redis，然后swoole读取并发送到客户端
+        $queue = Config::get('log.queue');
+        $job   = json_encode_unescape([
+            'route' => 'script/SocketLog/readLog',
+            'param' => ['log' => $content]
+        ]);
+        (new RedisClient())->rPush($queue, $job);
+    }
 
     return true;
+}
+
+/**
+ * 创建目录
+ * @param $dir
+ * @return bool
+ */
+function mark_directory($dir) {
+    return !is_dir($dir) && mkdir($dir, 0755, true);
 }
 
 /**
@@ -500,15 +521,6 @@ function import_excel($data=[], $title=[], $filename='file') {
 }
 
 /**
- * 递归创建目录
- * @param $dir
- * @return bool
- */
-function directory($dir) {
-    return  is_dir($dir) or directory(dirname($dir)) && mkdir($dir, 0775);
-}
-
-/**
  * 无限极分类，递归查询某分类的子分类
  * @param $category
  * @param int $id
@@ -588,22 +600,22 @@ function two_dim_array_unique($arr, $key=null) {
  */
 function get_params()
 {
-    $params = "";
+    $params = '';
     $inputs = $_REQUEST;
     ksort($inputs, SORT_STRING);
     foreach ($inputs as $key=>$value) {
-        if ($key=="op") continue;
+        if ('op' == $key || 's' == $key) continue;
 
         if (empty($params)) {
             if (is_array($value)) {
-                $params_value = implode(",", $value);
+                $params_value = implode(',', $value);
             } else {
                 $params_value = $value;
             }
             $params = "{$key}={$params_value}";
         } else {
             if (is_array($value)) {
-                $params_value = implode(",", $value);
+                $params_value = implode(',', $value);
             }else{
                 $params_value = $value;
             }

@@ -18,4 +18,10 @@ return [
         ':name' => ['index/hello', ['method' => 'post']],
     ],
 
+
+    'test/redis' => 'test/index/redis',
+    'test/session' => 'test/index/session',
+
 ];
+
+

@@ -254,10 +254,10 @@ class Controller
             $this->start_time = $global_start_time;
         }
         // 请求时间统计
-        $time_limit = ini_get('max_execution_time');
+        $time_limit = (string)ini_get('max_execution_time') . 's';
         $time_start = get_microtime($this->start_time);
         $time_end   = get_microtime(microtime());
-        $time_use   = ($time_end - $time_start) / 1000000;
+        $time_use   = (string)(($time_end - $time_start) / 1000000) . 's';
         $time_percent = (string)round($time_use / $time_limit, 4) * 100 . '%';
         $time_stat  = $time_limit . '_' . $time_use . '_' . $time_percent;
         // 使用内存统计
@@ -267,6 +267,10 @@ class Controller
         $memory_use     = (string)round($memory_use / pow(1024, 2), 2) . 'mb';
         $memory_limit   = (string)round($memory_limit / pow(1024, 2), 2) . 'mb';
         $memory_stat    = $memory_limit . '_' . $memory_use . '_' . $memory_percent;
+        // 路由
+        $route = $this->request->module() . '/' . $this->request->controller(). '/' . $this->request->action();
+        // 加载文件数量
+        $included_files = count(get_included_files());
         // 返回对应的数据类型
         if (empty($type)) {
             $type = Config::get('default_return_type');
@@ -275,8 +279,8 @@ class Controller
             // 返回json数据格式
             case 'JSON' :
                 $data = (object)$data;
-                $str  = sprintf("module=%s\tcontroller=%s\taction=%s\ttime_stat=%s\tmemory_stat=%s\t%s\terrcode=%s\terrmsg=%s",
-                    $this->request->module(), $this->request->controller(), $this->request->action(), $time_stat, $memory_stat, get_params(), $data->errcode, $data->errmsg);
+                $str  = sprintf("route=%s\ttime_stat=%s\tmemory_stat=%s\t%s\terrcode=%s\terrmsg=%s",
+                    $route, $time_stat, $memory_stat, get_params(), $data->errcode, $data->errmsg);
                 if (isset($data->log)) {
                     $str = $str . $data->log;
                     unset($data->log);

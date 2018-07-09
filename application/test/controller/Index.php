@@ -23,27 +23,29 @@ class Index extends Common
      * 框架测试
      */
     public function index()
-    {
-        try {
-            $param = $this->param;
+{
+    try {
+        $param = $this->param;
 
-            $config = Config::get('template_msg.pt_card_template_id');
+        $config = Config::get('template_msg.pt_card_template_id');
 
-            $data  = json_encode_unescape($param);
+        $data  = json_encode_unescape($param);
 
-            $this->ajaxReturn([
-                'errcode' => SUCCESS,
-                'errmsg'  => '获取成功!',
-                'data'    => $data,
-            ]);
+        logw('socket log test!', 'info', true);
 
-        } catch (\Exception $e) {
-            $this->ajaxReturn([
-                'errcode' => $e->getCode(),
-                'errmsg'  => $e->getMessage()
-            ]);
-        }
+        $this->ajaxReturn([
+            'errcode' => SUCCESS,
+            'errmsg'  => '获取成功!',
+            'data'    => $data,
+        ]);
+
+    } catch (\Exception $e) {
+        $this->ajaxReturn([
+            'errcode' => $e->getCode(),
+            'errmsg'  => $e->getMessage()
+        ]);
     }
+}
 
     /**
      * redis测试
@@ -95,6 +97,9 @@ class Index extends Common
             //dump($reflect->getProperties());
             //dump($reflect->getMethods());
             //die;
+
+            //$result = $UserBusModel->stringConditionQuery();
+
 
 
 
@@ -181,6 +186,14 @@ class Index extends Common
                 'errmsg'  => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * 读写分离测试
+     */
+    public function readWriteSeparate()
+    {
+
     }
 }
 

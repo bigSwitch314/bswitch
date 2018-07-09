@@ -221,7 +221,7 @@ class RedisClient
     }
 
     /**
-     * 返回LIST顶部（右侧）的VALUE，并且从LIST中把该VALUE弹出
+     * 返回LIST顶部（左侧）的VALUE，并且从LIST中把该VALUE弹出
      * @param $key
      * @param $val
      * @return int
@@ -229,6 +229,17 @@ class RedisClient
     public function lPush($key, $val)
     {
         return $this->getRedis($key)->lPush($key, $val);
+    }
+
+    /**
+     * 返回LIST顶部（右侧）的VALUE，并且从LIST中把该VALUE弹出
+     * @param $key
+     * @param $val
+     * @return int
+     */
+    public function rPush($key, $val)
+    {
+        return $this->getRedis($key)->rPush($key,$val);
     }
 
     /**
@@ -260,6 +271,36 @@ class RedisClient
     public function lIndex($key, $index)
     {
         return $this->getRedis()->lIndex($key, $index);
+    }
+
+    /**
+     * 往集合添加元素
+     * @param $key
+     * @param $val
+     */
+    public function sAdd($key, $val)
+    {
+        $this->getRedis()->sAdd($key, $val);
+    }
+
+    /**
+     * 返回集合所有元素
+     * @param $key
+     * @return array
+     */
+    public function sMembers($key)
+    {
+        return $this->getRedis()->sMembers($key);
+    }
+
+    /**
+     * 删除集合中的元素
+     * @param $key
+     * @param $val
+     */
+    public function sRem($key, $val)
+    {
+        $this->getRedis()->sRem($key, $val);
     }
 
     /**
