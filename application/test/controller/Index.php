@@ -84,7 +84,12 @@ class Index extends Common
     {
         try {
             $UserBusModel = new UserBusModel();  //dump($UserBusModel);die;
-            $map['bus_id'] = 1;
+
+            $reflect = new \ReflectionObject($UserBusModel);
+            //dump($reflect->getProperties());
+            //dump($reflect->getMethods());
+
+            $map['bus_id'] = 1; //echo 333;die;
             //$map['phone'] = 18203004644;
             $fields = 'user_id, username, phone';
             //$fields = '*';
@@ -193,7 +198,39 @@ class Index extends Common
      */
     public function readWriteSeparate()
     {
+        try {
+            $UserBusModel = new UserBusModel();  //dump($UserBusModel);die;
 
+
+            $map['bus_id'] = 1; //echo 333;die;
+            //$map['phone'] = 18203004644;
+            $map['is_disable'] = 0;
+            $fields = 'user_id, username, phone';
+            //$fields = '*';
+            $result = $UserBusModel->getMultiData($map, $fields, 'user_id');
+
+            //$result = $UserBusModel->updateData(['phone'=>18203004644], ['username'=>'李晨2']);
+
+            //$result = $UserBusModel->stringConditionQuery();
+
+            $data = [
+                'count' => count($result),
+                'list' => $result
+            ];
+
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
     }
 }
 
