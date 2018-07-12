@@ -345,6 +345,14 @@ abstract class Connection
      */
     public function query($sql, $bind = [], $master = false, $pdo = false)
     {
+        // 按配置比例读主从
+        if (false == $master) {
+            $percent = explode(':', $this->config['r_ms_percent']);
+            $num = mt_rand(1, array_sum($percent));
+            if ($num <= $percent[0]) $master = true;
+        }
+
+        // 链接数据库
         $this->initConnect($master);
         if (!$this->linkID) {
             return false;

@@ -210,7 +210,7 @@ class Index extends Common
             $result = $UserBusModel->getMultiData($map, $fields, 'user_id');
 
             //$result = $UserBusModel->updateData(['phone'=>18203004644], ['username'=>'李晨2']);
-
+            //die;
             //$result = $UserBusModel->stringConditionQuery();
 
             $data = [
