@@ -2,15 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: qiangluo
- * Date: 2018/6/27
- * Time: 下午11:14
+ * Date: 2018/7/13
+ * Time: 上午10:46
  */
 
-namespace app\common\model;
+namespace app\common\model\admin;
 
-use think\model;
+use think\Model;
 
-class Common extends model
+
+class RoleNode extends Model
 {
     /**
      * 查询单条记录
@@ -121,4 +122,5 @@ class Common extends model
             ->order($order)
             ->select();
     }
+
 }

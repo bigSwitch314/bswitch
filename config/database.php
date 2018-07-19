@@ -13,13 +13,13 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '127.0.0.1, 120.25.219.0',
+    'hostname'        => '127.0.0.1',
     // 数据库名
-    'database'        => 'test, test',
+    'database'        => 'test_bs',
     // 用户名
-    'username'        => 'root, guset',
+    'username'        => 'root',
     // 密码
-    'password'        => '420684, beta@#qniao!2016',
+    'password'        => '420684',
     // 端口
     'hostport'        => '3306',
     // 连接dsn
@@ -29,11 +29,11 @@ return [
     // 数据库编码默认采用utf8
     'charset'         => 'utf8',
     // 数据库表前缀
-    'prefix'          => 'rb_',
+    'prefix'          => 'bs_',
     // 数据库调试模式
     'debug'           => true,
     // 数据库部署方式:0 集中式(单一服务器),1 分布式(主从服务器)
-    'deploy'          => 1,
+    'deploy'          => 0,
     // 数据库读写是否分离 主从式有效
     'rw_separate'     => true,
     // 读主从比例

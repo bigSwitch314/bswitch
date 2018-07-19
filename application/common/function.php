@@ -328,19 +328,6 @@ function time_cross($begin_time1, $end_time1, $begin_time2, $end_time2) {
 }
 
 /**
- * 检查手机号格式
- * @param $mobile
- * @return mixed
- * @throws Exception
- */
-function check_phone($mobile) {
-    if (!is_numeric($mobile) || !preg_match('#^1[\d]{10}$#', $mobile))
-        throw new \Exception("手机号格式错误", PARAM_ERROR);
-
-    return $mobile;
-}
-
-/**
  * 默认获取当前时间戳为周几
  * @param int $time
  * @param int $offset
