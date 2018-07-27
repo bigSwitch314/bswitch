@@ -19,6 +19,7 @@ use think\Debug;
 use think\Exception;
 use think\exception\PDOException;
 use think\Log;
+use think\Config;
 
 /**
  * Class Connection
@@ -334,14 +335,14 @@ abstract class Connection
 
     /**
      * 执行查询 返回数据集
-     * @access public
-     * @param string        $sql sql指令
-     * @param array         $bind 参数绑定
-     * @param bool          $master 是否在主服务器读操作
-     * @param bool          $pdo 是否返回PDO对象
-     * @return mixed
+     * @param $sql
+     * @param array $bind
+     * @param bool $master
+     * @param bool $pdo
+     * @return bool|mixed
      * @throws PDOException
      * @throws \Exception
+     * @throws \Throwable
      */
     public function query($sql, $bind = [], $master = false, $pdo = false)
     {
@@ -386,24 +387,45 @@ abstract class Connection
                 $this->bindValue($bind);
             }
             // 执行查询
+            $time_start = get_microtime(microtime());
             $this->PDOStatement->execute();
+            $time_end = get_microtime(microtime());
+            $run_time = (string)(($time_end - $time_start) / 1000000) . 's';
+            if (false === strpos($this->getLastSql(), 'SHOW')) {
+                logw('[time]: ' . $run_time . "\t" . '[sql]: ' . $this->getLastSql()  . "\t[trace]: " . sql_trace(), 'sql');
+                if ($run_time >= Config::get('database.long_query_time')) {
+                    logw('[time]: ' . $run_time . "\t" . '[sql]: ' . $this->getLastSql()  . "\t[trace]: " . sql_trace(), 'slow-sql');;
+                }
+            }
             // 调试结束
             $this->debug(false, '', $master);
             // 返回结果集
             return $this->getResult($pdo, $procedure);
         } catch (\PDOException $e) {
+            logw('[sql]: ' . $this->getLastSql() . "\t" . preg_replace('#SQLSTATE.*?]#', '[error]', $e->getMessage()) . "\t[trace]: " . sql_trace(), 'sql-error');
             if ($this->isBreak($e)) {
                 return $this->close()->query($sql, $bind, $master, $pdo);
+            }
+            if (false == Config::get('app_debug')) {
+                throw new \Exception('网络错误！',DB_ERROR);
             }
             throw new PDOException($e, $this->config, $this->getLastsql());
         } catch (\Throwable $e) {
+            logw('[sql]: ' . $this->getLastSql() . "\t" . preg_replace('#SQLSTATE.*?]#', '[error]', $e->getMessage()) . "\t[trace]: " . sql_trace(), 'sql-error');
             if ($this->isBreak($e)) {
                 return $this->close()->query($sql, $bind, $master, $pdo);
             }
+            if (false == Config::get('app_debug')) {
+                throw new \Exception('网络错误！', DB_ERROR);
+            }
             throw $e;
         } catch (\Exception $e) {
+            logw('[sql]: ' . $this->getLastSql() . "\t" . preg_replace('#SQLSTATE.*?]#', '[error]', $e->getMessage()) . "\t[trace]: " . sql_trace(), 'sql-error');
             if ($this->isBreak($e)) {
                 return $this->close()->query($sql, $bind, $master, $pdo);
+            }
+            if (false == Config::get('app_debug')) {
+                throw new \Exception('网络错误！', DB_ERROR);
             }
             throw $e;
         }
@@ -411,13 +433,12 @@ abstract class Connection
 
     /**
      * 执行语句
-     * @access public
-     * @param  string        $sql sql指令
-     * @param  array         $bind 参数绑定
-     * @param  Query         $query 查询对象
-     * @return int
+     * @param $sql
+     * @param array $bind
+     * @param Query|null $query
+     * @return bool|int
      * @throws PDOException
-     * @throws \Exception
+     * @throws \Throwable
      */
     public function execute($sql, $bind = [], Query $query = null)
     {
@@ -454,7 +475,16 @@ abstract class Connection
                 $this->bindValue($bind);
             }
             // 执行语句
+            $time_start = get_microtime(microtime());
             $this->PDOStatement->execute();
+            $time_end = get_microtime(microtime());
+            $run_time = (string)(($time_end - $time_start) / 1000000) . 's';
+            if (false === strpos($this->getLastSql(), 'SHOW')) {
+                logw('[time]: ' . $run_time . "\t" . '[sql]: ' . $this->getLastSql()  . "\t[trace]: " . sql_trace(), 'sql');
+                if ($run_time >= Config::get('database.long_query_time')) {
+                    logw('[time]: ' . $run_time . "\t" . '[sql]: ' . $this->getLastSql()  . "\t[trace]: " . sql_trace(), 'slow-sql');;
+                }
+            }
             // 调试结束
             $this->debug(false, '', true);
 
@@ -465,18 +495,30 @@ abstract class Connection
             $this->numRows = $this->PDOStatement->rowCount();
             return $this->numRows;
         } catch (\PDOException $e) {
+            logw('[sql]: ' . $this->getLastSql() . "\t" . preg_replace('#SQLSTATE.*?]#', '[error]', $e->getMessage()) . "\t[trace]: " . sql_trace(), 'sql-error');
             if ($this->isBreak($e)) {
                 return $this->close()->execute($sql, $bind, $query);
+            }
+            if (false == Config::get('app_debug')) {
+                throw new \Exception('网络错误！',DB_ERROR);
             }
             throw new PDOException($e, $this->config, $this->getLastsql());
         } catch (\Throwable $e) {
+            logw('[sql]: ' . $this->getLastSql() . "\t" . preg_replace('#SQLSTATE.*?]#', '[error]', $e->getMessage()) . "\t[trace]: " . sql_trace(), 'sql-error');
             if ($this->isBreak($e)) {
                 return $this->close()->execute($sql, $bind, $query);
             }
+            if (false == Config::get('app_debug')) {
+                throw new \Exception('网络错误！',DB_ERROR);
+            }
             throw $e;
         } catch (\Exception $e) {
+            logw('[sql]: ' . $this->getLastSql() . "\t" . preg_replace('#SQLSTATE.*?]#', '[error]', $e->getMessage()) . "\t[trace]: " . sql_trace(), 'sql-error');
             if ($this->isBreak($e)) {
                 return $this->close()->execute($sql, $bind, $query);
+            }
+            if (false == Config::get('app_debug')) {
+                throw new \Exception('网络错误！',DB_ERROR);
             }
             throw $e;
         }

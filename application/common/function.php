@@ -73,7 +73,7 @@ function logw($msg, $file_name ='info', $socket_log=false) {
     $host_name = phpversion() < "5.3.0" ? $_SERVER['HOSTNAME'] : gethostname();
     $ip = get_real_ip();
     // 写日志
-    $content = sprintf("%s\tip=%s\t%s\thostname=%s\n", date("H:i:s"), $ip, $msg, $host_name);
+    $content = sprintf("%s\t[ip]: %s\t%s\t[hostname]: %s\n\n", date("H:i:s"), $ip, $msg, $host_name);
     $fp = fopen($log_file, 'a');
     fwrite($fp, $content);
     fclose($fp);
@@ -241,6 +241,31 @@ function other2byte ($other) {
             $byte = $other;
     }
     return $byte;
+}
+
+/**
+ * sql执行追踪
+ * @return string
+ */
+function sql_trace() {
+    $trace = debug_backtrace();
+    foreach ($trace as $value) {
+        if(false !== strpos($value['class'], 'controller')) {
+            $controller = 'class=' . $value['class'] . '  function=' . $value['function'];
+        }
+        if(false !== strpos($value['class'], 'service')) {
+            $service= 'class=' . $value['class'] . '  function=' . $value['function'];
+        }
+        if(false !== strpos($value['class'], 'model')) {
+            $model = 'class=' . $value['class'] . '  function=' . $value['function'];
+        }
+    }
+
+    $sql_trace = '';
+    if (isset($controller) && $controller) $sql_trace .= $controller;
+    if (isset($service)    && $service)    $sql_trace .= '    ' . $service;
+    if (isset($model)      && $model)      $sql_trace .= '    ' . $model;
+    return $sql_trace;
 }
 
 /**

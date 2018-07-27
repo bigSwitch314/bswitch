@@ -39,7 +39,7 @@ return [
     // 显示错误信息
     'show_error_msg'         => true,
     // 应用Trace
-    'app_trace'              => false,
+    'app_trace'              => true,
     // 应用模式状态
     'app_status'             => '',
     // 是否支持多模块

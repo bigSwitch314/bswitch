@@ -14,3 +14,6 @@ define('PARAM_ERROR', 40001);
 
 // 操作失败
 define('FAIL', 40002);
+
+// 网络错误
+define('DB_ERROR', 40003);

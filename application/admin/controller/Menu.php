@@ -73,6 +73,7 @@ class Menu extends Common
 
             $result = (new MenuService())->get($id);
 
+
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
                 'errmsg'  => '获取成功!',

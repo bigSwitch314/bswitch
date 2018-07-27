@@ -21,16 +21,16 @@ class Node extends Common
     {
         try {
             $param  = $this->param;
-            $id     = $param['id'];
-            $pid    = $param['pid'];
-            $gid    = $param['gid'];
-            $name   = $param['name'];
-            $title  = $param['title'];
-            $level  = $param['level'];
-            $status = $param['status'];
-            $sort   = $param['sort'];
-            $menu   = $param['menu'];
-            $module = $param['module'];
+            $id     = trim($param['id']);
+            $pid    = trim($param['pid']);
+            $gid    = trim($param['gid']);
+            $name   = trim($param['name']);
+            $title  = trim($param['title']);
+            $level  = trim($param['level']);
+            $status = trim($param['status']);
+            $sort   = trim($param['sort']);
+            $menu   = trim($param['menu']);
+            $module = trim($param['module']);
 
             check_number([$id], false);
             check_number([$pid, $gid, $sort]);

@@ -52,4 +52,6 @@ return [
     'datetime_format' => 'Y-m-d H:i:s',
     // 是否需要进行SQL性能分析
     'sql_explain'     => false,
+    // 慢查询时间(日志)
+    'long_query_time' => 0,
 ];

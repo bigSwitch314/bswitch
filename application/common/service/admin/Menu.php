@@ -96,11 +96,30 @@ class Menu
             $map['deleted'] = 0;
             $result = $this->getMenuModel()->getOneData(['id' => $id]);
         } else {
-            $map['deleted'] = 0;
-            $fields = 'id, name, pid, sort';
-            $order = 'create_time desc';
-            $result = $this->getMenuModel()->getMultiData($map, $fields, $order);
+            $result = $this->getMenuModel()->getMenu();
+            $temp = [];
+            foreach ($result as $val) {
+
+                if (empty($temp[$val['id']]['id'])) {
+                    $temp[$val['id']]['id']   = $val['id'];
+                    $temp[$val['id']]['name'] = $val['name'];
+                    $temp[$val['id']]['sort'] = $val['sort'];
+                }
+
+                if ($val['no_title']) {
+                    $temp[$val['id']]['son'][] = [
+                        'name'  => $val['no_title'],
+                        'level' => $val['no_level'],
+                        'url'   => $val['no3_name'] . '/' . $val['no2_name'] . '/' . $val['no_name'],
+                        'sort'  => $val['no_sort'],
+                    ];
+                } else {
+                    $temp[$val['id']]['son'] = [];
+                }
+            }
+            $result = array_values($temp);
         }
+
         return $result;
     }
 
