@@ -6,7 +6,7 @@ use app\common\controller\Common;
 class Index extends Common
 {
     /**
-     * Index constructor.
+     * Admin constructor.
      */
     public function __construct() {
         parent::__construct();

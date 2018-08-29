@@ -31,14 +31,22 @@ class Common extends model
      * @param array $where
      * @param array $fields
      * @param string $order
-     * @return mixed
+     * @param null $page_no
+     * @param null $page_size
+     * @return false
+     * @throws \think\exception\DbException
      */
-    public function getMultiData($where = [], $fields = ['id'], $order = 'id desc')
+    public function getMultiData($where = [],
+                                 $fields = ['id'],
+                                 $order = 'id desc',
+                                 $page_no = null,
+                                 $page_size = null)
     {
         return $this
             ->where($where)
             ->field($fields)
             ->order($order)
+            ->page($page_no, $page_size)
             ->select();
     }
 
@@ -110,7 +118,8 @@ class Common extends model
      * @param array $where
      * @param array $fields
      * @param string $order
-     * @return mixed
+     * @return false
+     * @throws \think\exception\DbException
      */
     public function getTableMultiData($table, $where = [], $fields = ['id'], $order = 'id asc')
     {

@@ -12,7 +12,7 @@ use think\Session;
 class Index extends Common
 {
     /**
-     * Index constructor.
+     * Admin constructor.
      */
     public function __construct()
     {
@@ -162,12 +162,12 @@ class Index extends Common
     public function session()
     {
         try {
-//            ini_set('session.save_handler','redis');
-//            ini_set('session.save_path','tcp://127.0.0.1:6379');
-//            session_start();
-//            $_SESSION['name2'] = 'luoqiang2';
-//            dump($_SESSION['name2']);
-//            dump(session_id());
+            ini_set('session.save_handler','redis');
+            ini_set('session.save_path','tcp://127.0.0.1:6379?auth=gZJfGZq7iS');
+            session_start();
+            $_SESSION['name2'] = 'luoqiang2';
+            dump($_SESSION['name2']);
+            dump(session_id());die;
 
             $redis = new RedisClient();
 
