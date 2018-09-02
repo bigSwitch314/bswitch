@@ -2,7 +2,7 @@
 namespace app\blog\controller;
 
 use app\common\controller\Common;
-use think\Config;
+use app\common\service\blog\Article as ArticleService;
 
 
 class Article extends Common
@@ -15,15 +15,185 @@ class Article extends Common
         parent::__construct();
     }
 
-    public function test()
+    /**
+     * 添加记录
+     */
+    public function add()
     {
-        dump(Config::get());
-        echo 11;die;
+        try {
+            $param        = $this->param;
+            $title        = $param['title'];
+            $category_id  = $param['category_id'];
+            $label_ids    = $param['label_ids'];
+            $release      = $param['release'];
+            $content      = $param['content'];
+
+            check_string([$title, $content]);
+            check_number($category_id);
+            check_string($label_ids, false);
+            check_number_range($release, [0, 1]);
+
+            $status = (new ArticleService())->save($id=0,
+                $title,
+                $category_id,
+                $label_ids,
+                $release,
+                $content);
+
+            if (false === $status) {
+                throw new \Exception('添加失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '添加成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
     }
 
+    /**
+     * 修改记录
+     */
+    public function edit()
+    {
+        try {
+            $param        = $this->param;
+            $id           = $param['id'];
+            $title        = $param['title'];
+            $category_id  = $param['category_id'];
+            $label_ids    = $param['label_ids'];
+            $release      = $param['release'];
+            $content      = $param['content'];
 
+            check_string([$title, $content]);
+            check_number($category_id);
+            check_string($label_ids, false);
+            check_number_range($release, [0, 1]);
 
+            $status = (new ArticleService())->save($id,
+                $title,
+                $category_id,
+                $label_ids,
+                $release,
+                $content);
+            if (false === $status) {
+                throw new \Exception('编辑失败！', FAIL);
+            }
 
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '编辑成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 获取记录
+     */
+    public function get()
+    {
+        try {
+            $param = $this->param;
+            $id    = $param['id'];
+            $page_no   = $param['page_no'];
+            $page_size = $param['page_size'];
+
+            check_number([$id, $page_no, $page_size], false);
+
+            $result = (new ArticleService())->get($id, $page_no, $page_size);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $result ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 删除记录
+     */
+    public function delete()
+    {
+        try {
+            $param = $this->param;
+            $id    = $param['id'];
+
+            if (false === strpos($id, ',')) {
+                check_number($id, true);
+            } else {
+                $id = array_filter(explode(',', $id));
+                check_not_null($id);
+            }
+
+            $status = (new ArticleService())->delete($id);
+
+            if (false === $status) {
+                throw new \Exception('删除失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '删除成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 修改文章发布状态
+     */
+    public function changeReleaseStatus()
+    {
+        try {
+            $param  = $this->param;
+            $id     = $param['id'];
+            $release = $param['release'];
+
+            check_number($id);
+            check_number($release, [0, 1]);
+
+            $status = (new ArticleService())->changeReleaseStatus($id, $release);
+
+            if (false === $status) {
+                throw new \Exception('修改失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '修改成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
 
 }
 

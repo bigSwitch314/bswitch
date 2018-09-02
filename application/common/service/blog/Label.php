@@ -82,8 +82,6 @@ class Label
             $map['delete'] = 0;
             $result = $this->getLabelModel()->getOneData(['id' => $id]);
         } else {
-            $page_no   = $page_no ?: 1;
-            $page_size = $page_size ?: 10;
             $map['delete'] = 0;
             $fields = 'id, name, from_unixtime(create_time, \'%Y-%m-%d %H:%i\') as create_time';
             $order  = 'create_time desc';

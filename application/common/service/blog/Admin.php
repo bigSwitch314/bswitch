@@ -145,7 +145,4 @@ class Admin
         return $this->getAdminModel()->updateData($map, $data);
     }
 
-
-
-
 }
