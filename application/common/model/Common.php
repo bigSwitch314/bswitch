@@ -63,11 +63,12 @@ class Common extends model
     /**
      * 添加多条记录
      * @param $data
-     * @return bool|string
+     * @return array|false
+     * @throws \Exception
      */
     public function addMultiData($data)
     {
-        return $this->addAll($data);
+        return $this->saveAll($data);
     }
 
     /**

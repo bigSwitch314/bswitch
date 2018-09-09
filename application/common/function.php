@@ -62,7 +62,7 @@ function logw($msg, $file_name ='info', $socket_log=false) {
     $log_size = Config::get('log_size') ?: 100 * 1024 * 1024;
     if (file_exists($log_file) && filesize($log_file) > $log_size) {
         $str = date('Y-m-d', strtotime('today')) . '-' . time();
-        $new_name = sprintf("/mnt/%s/log/%s/bs-%s.%s.log", Config::get("env"), date('Ym'), $file_name, $str);
+        $new_name = sprintf("/mnt/%s/log/%s/bs-%s.%s.log", get_env('env'), date('Ym'), $file_name, $str);
         rename($log_file, $new_name);
     }
     // 创建目录
