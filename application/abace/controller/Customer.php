@@ -45,9 +45,33 @@ class Customer extends Common
     public function add()
     {
         try {
-            $param        = $this->param;
+            $param           = $this->param;
+            $cat             = $param['cat'];
+            $first_name      = $param['first_name'];
+            $middle_name     = $param['middle_name'];
+            $last_name       = $param['last_name'];
+            $name            = $param['name'];
+            $title           = $param['title'];
+            $company         = $param['company'];
+            $mailing_address = $param['mailing_address'];
+            $phone           = $param['phone'];
+            $industry        = $param['industry'];
+            $tag             = $param['tag'];
 
-            $status = (new CustomerService())->save();
+            check_string($cat);
+
+            $status = (new CustomerService())->save($id=0,
+                $cat,
+                $first_name,
+                $middle_name,
+                $last_name,
+                $name,
+                $title,
+                $company,
+                $mailing_address,
+                $phone,
+                $industry,
+                $tag);
 
             if (false === $status) {
                 throw new \Exception('添加失败！', FAIL);
@@ -72,10 +96,36 @@ class Customer extends Common
     public function edit()
     {
         try {
-            $param        = $this->param;
-            $id           = $param['id'];
+            $param           = $this->param;
+            $id              = $param['id'];
+            $param           = $this->param;
+            $cat             = $param['cat'];
+            $first_name      = $param['first_name'];
+            $middle_name     = $param['middle_name'];
+            $last_name       = $param['last_name'];
+            $name            = $param['name'];
+            $title           = $param['title'];
+            $company         = $param['company'];
+            $mailing_address = $param['mailing_address'];
+            $phone           = $param['phone'];
+            $industry        = $param['industry'];
+            $tag             = $param['tag'];
 
-            $status = (new CustomerService())->save($id);
+            check_string($cat);
+
+            $status = (new CustomerService())->save($id,
+                $cat,
+                $first_name,
+                $middle_name,
+                $last_name,
+                $name,
+                $title,
+                $company,
+                $mailing_address,
+                $phone,
+                $industry,
+                $tag);
+
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);
             }
@@ -99,14 +149,24 @@ class Customer extends Common
     public function get()
     {
         try {
-            $param = $this->param;
+            $param  = $this->param;
             $id    = $param['id'];
+            $cat    = $param['cat'];
+            $title    = $param['title'];
+            $industry = $param['industry'];
+            $tag    = $param['tag'];
             $page_no   = $param['page_no'];
             $page_size = $param['page_size'];
 
             check_number([$id, $page_no, $page_size], false);
 
-            $result = (new CustomerService())->get($id, $page_no, $page_size);
+            $result = (new CustomerService())->get($id,
+                $cat,
+                $title,
+                $industry,
+                $tag,
+                $page_no,
+                $page_size);
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
@@ -156,7 +216,6 @@ class Customer extends Common
             ]);
         }
     }
-
 
 }
 

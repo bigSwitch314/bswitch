@@ -94,23 +94,107 @@ class Customer
 
     /**
      * 添加/修改记录
-     * @return bool
+     * @param $id
+     * @param $cat
+     * @param $first_name
+     * @param $middle_name
+     * @param $last_name
+     * @param $name
+     * @param $title
+     * @param $company
+     * @param $mailing_address
+     * @param $phone
+     * @param $industry
+     * @param $tag
+     * @return bool|false|int|mixed
      */
-    public function save()
+    public function save($id,
+                         $cat,
+                         $first_name,
+                         $middle_name,
+                         $last_name,
+                         $name,
+                         $title,
+                         $company,
+                         $mailing_address,
+                         $phone,
+                         $industry,
+                         $tag)
     {
-       return true;
+        $data['cat']             = $cat;
+        $data['first_name']      = $first_name      ?: '';
+        $data['middle_name']     = $middle_name     ?: '';
+        $data['last_name']       = $last_name       ?: '';
+        $data['name']            = $name            ?: '';
+        $data['title']           = $title           ?: '';
+        $data['company']         = $company         ?: '';
+        $data['mailing_address'] = $mailing_address ?: '';
+        $data['phone']           = $phone           ?: '';
+        $data['industry']        = $industry        ?: '';
+        $data['tag']             = $tag             ?: '';
+
+        if ($id) {
+            unset($map);
+            $map['id'] = $id;
+            $data['edit_time'] = time();
+            // cat不能相同
+            return $this->getCustomerModel()->updateData($map, $data);
+        } else {
+            // cat不能相同
+            $data['create_time'] = time();
+            return $this->getCustomerModel()->addOneData($data);
+        }
     }
 
     /**
-     * 获取记录
      * @param $id
+     * @param $cat
+     * @param $title
+     * @param $industry
+     * @param $tag
      * @param $page_no
      * @param $page_size
-     * @return bool
+     * @return array|mixed
+     * @throws \think\exception\DbException
      */
-    public function get($id, $page_no, $page_size)
+    public function get($id,
+                        $cat,
+                        $title,
+                        $industry,
+                        $tag,
+                        $page_no,
+                        $page_size)
     {
-        return true;
+        if ($id) {
+            $map['id'] = $id;
+            $map['delete'] = 0;
+            $result = $this->getCustomerModel()->getOneData(['id' => $id]);
+
+        } else {
+            if ($cat)      $map['cat']      = ['like', "%$cat%"];
+            if ($title)    $map['title']    = ['like', "%$title%"];
+            if ($industry) $map['industry'] = ['like', "%$industry%"];
+            if ($tag)      $map['tag']      = ['like', "%$tag%"];
+            $map['delete'] = 0;
+            $fields    = 'id, cat, first_name, middle_name, last_name, name, title, company, mailing_address, phone, industry, tag';
+            $order     = 'id desc';
+            $page_no   = $page_no ?: 1;
+            $page_size = $page_size ?: 10;
+
+            $list = $this->getCustomerModel()->getMultiData($map,
+                $fields,
+                $order,
+                $page_no,
+                $page_size);
+
+            $count = $this->getCustomerModel()->getDataCount(['delete'=>0]);
+
+            $result = [
+                'list' => $list ?: [],
+                'count' => $count ?: 0
+            ];
+        }
+        return $result;
     }
 
     /**
