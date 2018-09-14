@@ -9,6 +9,7 @@
 namespace app\common\service\abace;
 
 use app\common\model\abace\Customer as CustomerModel;
+use app\common\tools\SphinxClient;
 
 
 class Customer
@@ -56,6 +57,7 @@ class Customer
             $i = $start_num;
             while ($i++ <= $end_num) {
                 $num  = str_pad($i-1,8,'0',STR_PAD_LEFT );
+                $num_2  = str_pad((int)($i-1)/20000,8,'0',STR_PAD_LEFT );
                 $data = [
                     'id'          => $id++,
                     'cat'         => 'cat-' . $num,
@@ -64,10 +66,10 @@ class Customer
                     'last_name'   => $last_name_arr[array_rand($last_name_arr, 1)],
                     'name'        => 'null',
                     'title'       => $title_arr[array_rand($title_arr, 1)],
-                    'company'     => 'company-' . $num,
+                    'company'     => 'company-' . $num_2,
                     'mailing_address' => 'address' . $num,
                     'phone'       => 'phone-' . $num,
-                    'tag'         => 'tag-' . $num,
+                    'tag'         => 'tag-' . $num_2,
                     'industry'    => 'null',
                     'delete'      => 0,
                     'edit_time'   => 0,
@@ -76,13 +78,13 @@ class Customer
 
                 $data_new = $data['id'] . "\t" . $data['cat'] . "\t" . $data['first_name'] . "\t" . $data['middle_name'] . "\t"  . $data['last_name'] . "\t" .
                             $data['name'] . "\t" . $data['title'] . "\t" . $data['company'] . "\t"  . $data['mailing_address'] . "\t" .
-                            $data['phone'] . "\t" . $data['tag'] . "\t" . $data['industry'] . "\t"  . $data['delete'] . "\t". $data['edit_time'] . "\t".$data['create_time'] . "\t". "\n" ;
+                            $data['phone'] . "\t"  . $data['industry'] . $data['tag'] . "\t" . "\t"  . $data['delete'] . "\t". $data['edit_time'] . "\t".$data['create_time'] . "\t". "\n" ;
 
-                file_put_contents('/home/www/test_data.txt', $data_new, FILE_APPEND);
+                file_put_contents('/home/www/_6data.txt', $data_new, FILE_APPEND);
             }
         };
 
-        $generateData(10383397, 10000001, 11000000);
+        $generateData(10000001, 10000001, 11000000);
 
         echo 'end_time: ' . date('Y-m-d H:i:s', time()) . PHP_EOL;
 
@@ -90,6 +92,26 @@ class Customer
         echo 'memory: ' . $memory;
 
         exit;
+    }
+
+    /**
+     * 获取Sphinx查询结果
+     * @param $key
+     * @return string
+     */
+    public function getSphinxQueryIds($key)
+    {
+        $Sphinx = SphinxClient::getInstance(); // 单例模式
+        $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
+        $Sphinx->SetLimits(0, 1000);
+        $result = $Sphinx->query($key, 'customer');
+
+        $ids = '';
+        if (isset($result['matches'])) {
+            $ids = implode(',',array_keys($result['matches']));
+        }
+
+        return $ids;
     }
 
     /**
@@ -107,6 +129,7 @@ class Customer
      * @param $industry
      * @param $tag
      * @return bool|false|int|mixed
+     * @throws \Exception
      */
     public function save($id,
                          $cat,
@@ -132,15 +155,24 @@ class Customer
         $data['phone']           = $phone           ?: '';
         $data['industry']        = $industry        ?: '';
         $data['tag']             = $tag             ?: '';
+        $key = '@cat ' . '*' . $cat . '*' ;
 
         if ($id) {
+            // cat不能重复
+            $result = $this->getSphinxQueryIds($key);
+            if ($result && $result !== $id) {
+                throw new \Exception('cat名不能重复！');
+            }
             unset($map);
             $map['id'] = $id;
             $data['edit_time'] = time();
-            // cat不能相同
             return $this->getCustomerModel()->updateData($map, $data);
         } else {
-            // cat不能相同
+            // cat不能重复
+            $result = $this->getSphinxQueryIds($key);
+            if ($result) {
+                throw new \Exception('cat名不能重复！');
+            }
             $data['create_time'] = time();
             return $this->getCustomerModel()->addOneData($data);
         }
@@ -171,27 +203,35 @@ class Customer
             $result = $this->getCustomerModel()->getOneData(['id' => $id]);
 
         } else {
-            if ($cat)      $map['cat']      = ['like', "%$cat%"];
-            if ($title)    $map['title']    = ['like', "%$title%"];
-            if ($industry) $map['industry'] = ['like', "%$industry%"];
-            if ($tag)      $map['tag']      = ['like', "%$tag%"];
-            $map['delete'] = 0;
-            $fields    = 'id, cat, first_name, middle_name, last_name, name, title, company, mailing_address, phone, industry, tag';
-            $order     = 'id desc';
-            $page_no   = $page_no ?: 1;
-            $page_size = $page_size ?: 10;
+            if ($cat) {
+                $key = '@cat ' . '*'. $cat . '*';
+            } elseif ($title) {
+                $key = '@title ' . '*'. $title . '*';
+            } elseif ($industry) {
+                $key = '@industry ' . '*'. $industry . '*';
+            } elseif ($tag) {
+                $key = '@tag ' . '*'. $tag . '*';
+            }
+            $ids = $this->getSphinxQueryIds($key);
 
-            $list = $this->getCustomerModel()->getMultiData($map,
-                $fields,
-                $order,
-                $page_no,
-                $page_size);
-
-            $count = $this->getCustomerModel()->getDataCount(['delete'=>0]);
+            if ($ids) {
+                $map['delete'] = 0;
+                $map['id'] = ['in', $ids];
+                $fields    = 'id, cat, first_name, middle_name, last_name, name, title, company, mailing_address, phone, industry, tag';
+                $order     = 'id desc';
+                $page_no   = $page_no ?: 1;
+                $page_size = $page_size ?: 10;
+                $list = $this->getCustomerModel()->getMultiData($map,
+                    $fields,
+                    $order,
+                    $page_no,
+                    $page_size);
+                $count = $this->getCustomerModel()->getDataCount($map);
+            }
 
             $result = [
-                'list' => $list ?: [],
-                'count' => $count ?: 0
+                'count' => $count ?: 0,
+                'list'  => $list ?: []
             ];
         }
         return $result;

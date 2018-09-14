@@ -248,4 +248,10 @@ return [
         ],
     ],
 
+    // sphinx配置
+    'sphinx_conf' => [
+        'host' => '127.0.0.1',
+        'port' => 9312
+    ],
+
 ];

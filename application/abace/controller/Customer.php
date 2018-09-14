@@ -3,6 +3,7 @@ namespace app\abace\controller;
 
 use app\common\controller\Common;
 use app\common\service\abace\Customer as CustomerService;
+use app\common\tools\SphinxClient;
 
 
 class Customer extends Common
@@ -21,7 +22,7 @@ class Customer extends Common
     public function getTestData()
     {
         try {
-           
+
 
             (new CustomerService())->getTestData();
 
@@ -36,7 +37,35 @@ class Customer extends Common
                 'errmsg'  => $e->getMessage()
             ]);
         }
-        
+
+    }
+
+    /**
+     * Sphinx测试
+     */
+    public function testSphinx()
+    {
+        try {
+            $Sphinx = SphinxClient::getInstance(); // 单例模式
+            $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
+            $Sphinx->SetLimits(0, 1000);
+            $result = $Sphinx->query("@cat *cat-100000*", 'customer');
+            dump($result);
+            dump(implode(',',array_keys($result['matches'])));
+            exit;
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+
     }
     
     /**
