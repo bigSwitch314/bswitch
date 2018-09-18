@@ -636,3 +636,4 @@ function get_params()
     }
     return $params;
 }
+

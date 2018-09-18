@@ -179,21 +179,18 @@ class Customer
     }
 
     /**
+     * 获取记录
      * @param $id
-     * @param $cat
-     * @param $title
-     * @param $industry
-     * @param $tag
+     * @param $type
+     * @param $keyword
      * @param $page_no
      * @param $page_size
      * @return array|mixed
      * @throws \think\exception\DbException
      */
     public function get($id,
-                        $cat,
-                        $title,
-                        $industry,
-                        $tag,
+                        $type,
+                        $keyword,
                         $page_no,
                         $page_size)
     {
@@ -203,21 +200,27 @@ class Customer
             $result = $this->getCustomerModel()->getOneData(['id' => $id]);
 
         } else {
-            if ($cat) {
-                $key = '@cat ' . '*'. $cat . '*';
-            } elseif ($title) {
-                $key = '@title ' . '*'. $title . '*';
-            } elseif ($industry) {
-                $key = '@industry ' . '*'. $industry . '*';
-            } elseif ($tag) {
-                $key = '@tag ' . '*'. $tag . '*';
+
+            switch ($type) {
+                case 1:
+                    $key = '@cat ' . '*'. $keyword . '*';
+                    break;
+                case 2:
+                    $key = '@title ' . '*'. $keyword . '*';
+                    break;
+                case 3:
+                    $key = '@industry ' . '*'. $keyword . '*';
+                    break;
+                case 4:
+                    $key = '@tag ' . '*'. $keyword . '*';
+                    break;
             }
             $ids = $this->getSphinxQueryIds($key);
 
             if ($ids) {
                 $map['delete'] = 0;
                 $map['id'] = ['in', $ids];
-                $fields    = 'id, cat, first_name, middle_name, last_name, name, title, company, mailing_address, phone, industry, tag';
+                $fields    = 'id, cat, first_name, middle_name, last_name, name, title, company, mailing_address as address, phone, ifnull(industry, \'-\') as industry, tag, ifnull(from_unixtime(create_time, \'%Y-%m-%d\'), \'-\') as create_time';
                 $order     = 'id desc';
                 $page_no   = $page_no ?: 1;
                 $page_size = $page_size ?: 10;

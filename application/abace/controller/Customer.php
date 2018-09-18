@@ -82,7 +82,7 @@ class Customer extends Common
             $name            = $param['name'];
             $title           = $param['title'];
             $company         = $param['company'];
-            $mailing_address = $param['mailing_address'];
+            $mailing_address = $param['address'];
             $phone           = $param['phone'];
             $industry        = $param['industry'];
             $tag             = $param['tag'];
@@ -127,7 +127,6 @@ class Customer extends Common
         try {
             $param           = $this->param;
             $id              = $param['id'];
-            $param           = $this->param;
             $cat             = $param['cat'];
             $first_name      = $param['first_name'];
             $middle_name     = $param['middle_name'];
@@ -135,7 +134,7 @@ class Customer extends Common
             $name            = $param['name'];
             $title           = $param['title'];
             $company         = $param['company'];
-            $mailing_address = $param['mailing_address'];
+            $mailing_address = $param['address'];
             $phone           = $param['phone'];
             $industry        = $param['industry'];
             $tag             = $param['tag'];
@@ -178,22 +177,20 @@ class Customer extends Common
     public function get()
     {
         try {
-            $param  = $this->param;
-            $id    = $param['id'];
-            $cat    = $param['cat'];
-            $title    = $param['title'];
-            $industry = $param['industry'];
-            $tag    = $param['tag'];
+            $param     = $this->param;
+            $id        = $param['id'];
+            $type      = $param['type'];
+            $keyword   = $param['keyword'];
             $page_no   = $param['page_no'];
             $page_size = $param['page_size'];
 
             check_number([$id, $page_no, $page_size], false);
+            check_string($keyword, false);
+            check_number_range($type, [1, 2, 3, 4], false);
 
             $result = (new CustomerService())->get($id,
-                $cat,
-                $title,
-                $industry,
-                $tag,
+                $type,
+                $keyword,
                 $page_no,
                 $page_size);
 
