@@ -6,12 +6,14 @@
  * Time: 上午10:47
  */
 
-namespace app\common\model\blog;
+namespace app\common\model\abace;
 
 use app\common\model\Common;
 
 
-class Customer extends Common
+class Admin extends Common
 {
+
+
 
 }

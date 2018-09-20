@@ -253,4 +253,59 @@ class Customer
         return $this->getCustomerModel()->updateData($map, $data);
     }
 
+    /**
+     * 查询tag列表
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getTagList($page_no, $page_size)
+    {
+        $table = 'bs_tag';
+        $map['delete'] = 0;
+        $fields = 'id, name, if(create_time!=0,from_unixtime(create_time, \'%Y-%m-%d\'),\'—\') as create_time';
+        $order = 'id asc';
+
+        $list = $this->getCustomerModel()->getTableMultiData($table,
+            $map,
+            $fields,
+            $order,
+            $page_no,
+            $page_size);
+
+        $count =  $this->getCustomerModel()->getTableDataCount($table, $map);
+
+        return [
+            'count' => $count ?: 0,
+            'list'  => $list ?: []
+        ];
+    }
+
+    /**
+     * 查询company列表
+     * @param $page_no
+     * @param $page_size
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getCompanyList($page_no, $page_size)
+    {
+        $table = 'bs_company';
+        $map['delete'] = 0;
+        $fields = 'id, name, if(create_time!=0,from_unixtime(create_time, \'%Y-%m-%d\'),\'—\') as create_time';
+        $order = 'id asc';
+
+        $list = $this->getCustomerModel()->getTableMultiData($table,
+            $map,
+            $fields,
+            $order,
+            $page_no,
+            $page_size);
+
+        $count =  $this->getCustomerModel()->getTableDataCount($table, $map);
+
+        return [
+            'count' => $count ?: 0,
+            'list'  => $list ?: []
+        ];
+    }
 }

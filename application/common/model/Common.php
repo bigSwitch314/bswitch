@@ -119,18 +119,38 @@ class Common extends model
      * @param array $where
      * @param array $fields
      * @param string $order
+     * @param null $page_no
+     * @param null $page_size
      * @return false
      * @throws \think\exception\DbException
      */
-    public function getTableMultiData($table, $where = [], $fields = ['id'], $order = 'id asc')
+    public function getTableMultiData($table,
+                                      $where = [],
+                                      $fields = ['id'],
+                                      $order = 'id asc',
+                                      $page_no = null,
+                                      $page_size = null)
     {
         return $this
             ->table($table)
             ->where($where)
             ->field($fields)
             ->order($order)
+            ->page($page_no, $page_size)
             ->select();
     }
 
-
+    /**
+     * 统计指定表记录数量
+     * @param $table
+     * @param array $where
+     * @return int|string
+     */
+    public function getTableDataCount($table, $where = [])
+    {
+        return $this
+            ->table($table)
+            ->where($where)
+            ->count();
+    }
 }

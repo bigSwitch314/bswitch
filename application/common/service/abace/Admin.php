@@ -6,9 +6,11 @@
  * Time: 下午12:00
  */
 
-namespace app\common\service\blog;
+namespace app\common\service\abace;
 
-use app\common\model\blog\Admin as AdminModel;
+use app\common\model\abace\Admin as AdminModel;
+use think\Config;
+use Firebase\JWT\JWT;
 
 
 class Admin
@@ -143,6 +145,40 @@ class Admin
         $data['status'] = $status;
         $data['edit_time'] = time();
         return $this->getAdminModel()->updateData($map, $data);
+    }
+
+    /**
+     * 登录
+     * @param $username
+     * @param $password
+     * @return mixed
+     * @throws \Exception
+     */
+    public function login($username, $password)
+    {
+        $map['username'] = $username;
+        $result = $this->getAdminModel()->getOneData($map);
+        if ($result && $result['password'] != $password || empty($result)) {
+            throw  new \Exception('用户名或密码错误', FAIL);
+        }
+
+        $key = Config::get('encode_key');
+        $time = time();
+        $token = [
+            'nbf' => $time,           //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
+            'exp' => $time + 60 * 60, //过期时间,这里设置1小时
+            'data' => [               //自定义信息，不要定义敏感信息
+                'user_id' => $result['id'],
+                'username' => $result['username'],
+            ]
+        ];
+        $token = JWT::encode($token, $key);
+
+        return [
+            'user_id' => $result['id'],
+            'username' => $result['username'],
+            'token' => $token
+        ];
     }
 
 }

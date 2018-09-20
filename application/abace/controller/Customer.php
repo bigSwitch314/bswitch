@@ -243,6 +243,62 @@ class Customer extends Common
         }
     }
 
+    /**
+     * 获取tag列表
+     */
+    public function getTagList()
+    {
+        try {
+            $param     = $this->param;
+            $page_no   = $param['page_no'];
+            $page_size = $param['page_size'];
+
+            check_number([$page_no, $page_size]);
+
+            $data = (new CustomerService())->getTagList($page_no, $page_size);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 获取company列表
+     */
+    public function getCompanyList()
+    {
+        try {
+            $param     = $this->param;
+            $page_no   = $param['page_no'];
+            $page_size = $param['page_size'];
+
+            check_number([$page_no, $page_size]);
+
+            $data = (new CustomerService())->getCompanyList($page_no, $page_size);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
 }
 
 
