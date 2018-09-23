@@ -23,7 +23,8 @@ class Article extends Common
     public function getArticleList($page_no, $page_size)
     {
         $map['ar.delete'] = 0;
-        $fields = 'ar.id, ar.title, ca.name as category_name , ifnull(group_concat(la.name), "—") as label_name, ar.content, ar.read_number, ar.release, from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
+        $fields = 'ar.id, ar.title, ca.name as category_name , ifnull(group_concat(la.name), "—") as label_name, ar.content_md, ar.content_html, ar.read_number, ar.release, 
+                   from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
         $order  = 'ar.create_time desc';
         return $this
             ->alias('ar')

@@ -57,7 +57,7 @@ class Customer
             $i = $start_num;
             while ($i++ <= $end_num) {
                 $num  = str_pad($i-1,8,'0',STR_PAD_LEFT );
-                $num_2  = str_pad((int)($i-1)/20000,8,'0',STR_PAD_LEFT );
+                $num_2  = str_pad(($i-1)%20000,8,'0',STR_PAD_LEFT );
                 $data = [
                     'id'          => $id++,
                     'cat'         => 'cat-' . $num,
@@ -78,13 +78,13 @@ class Customer
 
                 $data_new = $data['id'] . "\t" . $data['cat'] . "\t" . $data['first_name'] . "\t" . $data['middle_name'] . "\t"  . $data['last_name'] . "\t" .
                             $data['name'] . "\t" . $data['title'] . "\t" . $data['company'] . "\t"  . $data['mailing_address'] . "\t" .
-                            $data['phone'] . "\t"  . $data['industry'] . $data['tag'] . "\t" . "\t"  . $data['delete'] . "\t". $data['edit_time'] . "\t".$data['create_time'] . "\t". "\n" ;
+                            $data['phone'] . "\t"  . $data['industry'] . "\t" .$data['tag'] . "\t" .  $data['delete'] . "\t". $data['edit_time'] . "\t".$data['create_time'] . "\t". "\n" ;
 
-                file_put_contents('/home/www/_6data.txt', $data_new, FILE_APPEND);
+                file_put_contents('/home/www/_1data.txt', $data_new, FILE_APPEND);
             }
         };
 
-        $generateData(10000001, 10000001, 11000000);
+        $generateData(1, 1, 5000000);
 
         echo 'end_time: ' . date('Y-m-d H:i:s', time()) . PHP_EOL;
 

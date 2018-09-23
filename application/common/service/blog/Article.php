@@ -38,28 +38,29 @@ class Article
     }
 
     /**
-     * 添加/修改记录
      * @param $id
      * @param $title
      * @param $category_id
      * @param $label_ids
      * @param $release
-     * @param $content
+     * @param $content_md
+     * @param $content_html
      * @return bool|false|int|mixed
-     * @throws \Exception
      */
     public function save($id,
                          $title,
                          $category_id,
                          $label_ids,
                          $release,
-                         $content)
+                         $content_md,
+                         $content_html)
     {
-        $data['title']       = $title;
-        $data['category_id'] = $category_id;
-        $data['label_ids']   = $label_ids ?: '';
-        $data['release']     = $release;
-        $data['content']     = $content;
+        $data['title']        = $title;
+        $data['category_id']  = $category_id;
+        $data['label_ids']    = $label_ids ?: '';
+        $data['release']      = $release;
+        $data['content_md']   = $content_md;
+        $data['content_html'] = $content_html;
         if ($id) {
             unset($map);
             $map['id'] = $id;
@@ -90,7 +91,7 @@ class Article
                 $val = (int)$val;
             });
         } else {
-            $list = $this->getArticleModel()->getArticleList($page_no, $page_size);
+            $list  = $this->getArticleModel()->getArticleList($page_no, $page_size);
             $count = $this->getArticleModel()->getDataCount(['delete'=>0]);
 
             $result = [
