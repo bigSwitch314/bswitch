@@ -140,3 +140,38 @@ function check_not_null($param) {
     }
     return true;
 }
+
+/**
+ * 日期验证
+ * @param $date
+ * @param bool $must
+ * @return bool
+ * @throws Exception
+ */
+function check_date($date, $must = true) {
+    if (is_array($date)) {
+        array_map(function($value) use ($must) {
+            if (empty($value) && true == $must) {
+                throw new \Exception('参数错误！', PARAM_ERROR);
+            }
+            if (empty($value) && false == $must) {
+                return true;
+            }
+            if (!empty($value) && !strtotime($value)) {
+                throw new \Exception('参数错误！', PARAM_ERROR);
+            }
+            return true;
+        }, $date);
+    } else {
+        if (empty($date) && true == $must) {
+            throw new \Exception('参数错误！', PARAM_ERROR);
+        }
+        if (empty($date) && false == $must) {
+            return true;
+        }
+        if (!empty($date) && !strtotime($date)) {
+            throw new \Exception('参数错误！', PARAM_ERROR);
+        }
+    }
+    return true;
+}

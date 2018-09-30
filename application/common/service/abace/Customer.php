@@ -103,7 +103,7 @@ class Customer
     {
         $Sphinx = SphinxClient::getInstance(); // 单例模式
         $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
-        $Sphinx->SetLimits(0, 1000);
+        $Sphinx->SetLimits(0, 500);
         $result = $Sphinx->query($key, 'customer');
 
         $ids = '';

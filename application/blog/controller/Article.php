@@ -109,14 +109,28 @@ class Article extends Common
     public function get()
     {
         try {
-            $param = $this->param;
-            $id    = $param['id'];
-            $page_no   = $param['page_no'];
-            $page_size = $param['page_size'];
+            $param       = $this->param;
+            $id          = $param['id'];
+            $page_no     = $param['page_no'];
+            $page_size   = $param['page_size'];
+            $title       = $param['title'];
+            $begin_time  = $param['begin_time'];
+            $end_time    = $param['end_time'];
+            $category_id = $param['category_id'];
+            $label_ids   = $param['label_ids'];
 
-            check_number([$id, $page_no, $page_size], false);
+            check_number([$id, $page_no, $page_size, $category_id], false);
+            check_date([$begin_time, $end_time], false);
+            check_string([$title, $label_ids], false);
 
-            $result = (new ArticleService())->get($id, $page_no, $page_size);
+            $result = (new ArticleService())->get($id,
+                $page_no,
+                $page_size,
+                $title,
+                $begin_time,
+                $end_time,
+                $category_id,
+                $label_ids);
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
