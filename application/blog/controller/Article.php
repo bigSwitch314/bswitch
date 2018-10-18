@@ -118,6 +118,7 @@ class Article extends Common
             $end_time    = $param['end_time'];
             $category_id = $param['category_id'];
             $label_ids   = $param['label_ids'];
+            $back_ground = $param['back_ground'] ?: 0;
 
             check_number([$id, $page_no, $page_size, $category_id], false);
             check_date([$begin_time, $end_time], false);
@@ -130,7 +131,8 @@ class Article extends Common
                 $begin_time,
                 $end_time,
                 $category_id,
-                $label_ids);
+                $label_ids,
+                $back_ground);
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
@@ -212,6 +214,35 @@ class Article extends Common
             ]);
         }
     }
+
+    /**
+     * 文章详情（前台）
+     */
+    public function getDetail()
+    {
+        try {
+            $param = $this->param;
+            $id    = $param['id'];
+
+            check_number($id);
+
+            $result = (new ArticleService())->getDetial($id);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $result ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+
 
 }
 

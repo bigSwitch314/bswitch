@@ -137,7 +137,8 @@ class Article
                         $begin_time,
                         $end_time,
                         $category_id,
-                        $label_ids)
+                        $label_ids,
+                        $back_ground)
     {
         if ($id) {
             $map['id'] = $id;
@@ -148,11 +149,12 @@ class Article
                 $val = (int)$val;
             });
         } else {
-            if ($title)       $map['ar.title']       = ['like', "%$title%"];
-            if ($begin_time)  $map['ar.create_time'] = ['gt', $begin_time];
-            if ($end_time)    $map['ar.create_time'] = ['gt', $end_time];
-            if ($label_ids)   $map['al.label_id']    = ['in', $label_ids];
-            if ($category_id) $map['ar.category_id'] = $category_id;
+            if ($title)              $map['ar.title']       = ['like', "%$title%"];
+            if ($begin_time)         $map['ar.create_time'] = ['gt', $begin_time];
+            if ($end_time)           $map['ar.create_time'] = ['gt', $end_time];
+            if ($label_ids)          $map['al.label_id']    = ['in', $label_ids];
+            if ($category_id)        $map['ar.category_id'] = $category_id;
+            if (empty($back_ground)) $map['ar.release']     = 1;
             $map['ar.delete'] = 0;
             $articles  = $this->getArticleModel()->getArticleList($map, $page_no, $page_size);
 
@@ -163,8 +165,24 @@ class Article
                 $label = array_column((array)$label, null, 'article_id');
                 array_walk($articles['list'], function(&$value) use($label) {
                     $value['label_name'] = $label[$value['id']]['label_name'];
+                    // 文字内容标签
+                    $value['content'] = strip_tags($value['content']);
                 });
             }
+
+            // 文字内容过滤标签
+            array_walk($articles['list'], function(&$value) {
+                $value['content'] = strip_tags($value['content']);
+                // 文字大于100个字符，去掉末尾标点，再在后面添加省略号
+                if (100 <= mb_strlen($value['content'], 'utf8')) {
+                    $char = ['、', '，', ',', '：', '。', ':', '!', '！', '?', '？','(', ')', '（', '）', '{', '}', '【', '】', '[', ']'];
+                    $last_char = mb_substr(trim($value['content']), mb_strlen($value['content'], 'utf8')-1, 1, 'utf8');
+                    if (in_array($last_char, $char)) {
+                        $value['content'] = mb_substr(trim($value['content']), 0, mb_strlen($value['content'], 'utf8')-1 ,'utf8');
+                    }
+                    $value['content'] = $value['content'] . ' ...';
+                }
+            });
 
             $result = [
                 'list'  => $articles['list']  ?: [],
@@ -199,6 +217,43 @@ class Article
         $data['release'] = $release;
         $data['edit_time'] = time();
         return $this->getArticleModel()->updateData($map, $data);
+    }
+
+    /**
+     * 文章详情（前台）
+     * @param $id
+     * @return array
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    public function getDetial($id)
+    {
+        $article = $this->getArticleModel()->getDetail($id);
+        if ($article['label']) {
+            $label = explode(',', $article['label']);
+            foreach ($label as $value) {
+                $item = explode('-', $value);
+                $label_new[] = [
+                    'id' => $item[0],
+                    'name' => $item[1],
+                ];
+            }
+            $article['label'] = isset($label_new) ? $label_new : [];
+        }
+
+        // 获取上一篇、下一篇文章
+        $pre_next = $this->getArticleModel()->getPreNextArticle($id);
+        foreach ($pre_next as $value) {
+            if (1 == $value['type']) $pre  = $value;
+            if (2 == $value['type']) $next = $value;
+        }
+
+        return [
+            'article' => $article,
+            'pre'     => isset($pre)  ? $pre  : '',
+            'next'    => isset($next) ? $next : '',
+        ];
     }
 
 }
