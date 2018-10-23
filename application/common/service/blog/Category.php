@@ -114,4 +114,51 @@ class Category
         return $this->getCategoryModel()->updateData($map, $data);
     }
 
+    /**
+     * 所有分类统计
+     * @throws \think\exception\DbException
+     */
+    public function getAllCategoryStats()
+    {
+        $result = $this->getCategoryModel()->getAllCategoryStats();
+        return [
+            'list'  => $result,
+            'count' => count($result)
+        ];
+    }
+
+    /**
+     * 根据分类查文章
+     * @param $id
+     * @param $page_no
+     * @param $page_size
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getArticleByCategory($id, $page_no, $page_size)
+    {
+        $map = [
+            'category_id' => $id,
+            'release'     => 1,
+            'delete'      => 0,
+        ];
+        $table  = 'bs_article';
+        $fields = 'id, title, from_unixtime(create_time, \'%m-%d\') as create_time';
+        $order  = 'create_time desc';
+
+        $list = $this->getCategoryModel()->getTableMultiData($table,
+            $map,
+            $fields,
+            $order,
+            $page_no,
+            $page_size);
+
+        $count = $this->getCategoryModel()->getTableDataCount($table, $map);
+
+        return [
+            'list'  => $list,
+            'count' => $count,
+        ];
+    }
+
 }
