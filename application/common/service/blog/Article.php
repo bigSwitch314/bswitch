@@ -61,6 +61,7 @@ class Article
      * @param $title
      * @param $category_id
      * @param $label_ids
+     * @param $type
      * @param $release
      * @param $content_md
      * @param $content_html
@@ -70,6 +71,7 @@ class Article
                          $title,
                          $category_id,
                          $label_ids,
+                         $type,
                          $release,
                          $content_md,
                          $content_html)
@@ -78,6 +80,7 @@ class Article
         $data['title']        = $title;
         $data['category_id']  = $category_id;
         $data['label_ids']    = $label_ids ?: '';
+        $data['type']         = $type;
         $data['release']      = $release;
         $data['content_md']   = $content_md;
         $data['content_html'] = $content_html;
@@ -127,6 +130,8 @@ class Article
      * @param $end_time
      * @param $category_id
      * @param $label_ids
+     * @param $type
+     * @param $back_ground
      * @return array|false
      * @throws \think\exception\DbException
      */
@@ -138,6 +143,7 @@ class Article
                         $end_time,
                         $category_id,
                         $label_ids,
+                        $type,
                         $back_ground)
     {
         if ($id) {
@@ -153,6 +159,7 @@ class Article
             if ($begin_time)         $map['ar.create_time'] = ['gt', $begin_time];
             if ($end_time)           $map['ar.create_time'] = ['gt', $end_time];
             if ($label_ids)          $map['al.label_id']    = ['in', $label_ids];
+            if ($type)               $map['type']           = $type;
             if ($category_id)        $map['ar.category_id'] = $category_id;
             if (empty($back_ground)) $map['ar.release']     = 1;
             $map['ar.delete'] = 0;
@@ -170,7 +177,7 @@ class Article
                 });
             }
 
-            // 文字内容过滤标签
+            // 文字内容过滤标点
             array_walk($articles['list'], function(&$value) {
                 $value['content'] = strip_tags($value['content']);
                 // 文字大于100个字符，去掉末尾标点，再在后面添加省略号
@@ -253,6 +260,46 @@ class Article
             'article' => $article,
             'pre'     => isset($pre)  ? $pre  : '',
             'next'    => isset($next) ? $next : '',
+        ];
+    }
+
+    /**
+     * 文章归档（前台）
+     * @param $page_no
+     * @param $page_size
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getArchive($page_no, $page_size) {
+        $map = [
+            'delete'  => 0,
+            'release' => 1,
+        ];
+        $fields = 'id, title, from_unixtime(create_time, \'%m-%d\') as date, from_unixtime(create_time, \'%Y\') as year';
+        $order  = 'create_time desc';
+
+        $list = $this->getArticleModel()->getMultiData($map,
+            $fields,
+            $order,
+            $page_no,
+            $page_size);
+        $count = $this->getArticleModel()->getDataCount($map);
+
+        $list[0]['isDisplayYear'] = 1;
+        $year = (int)$list[0]['year'];
+        foreach ($list as $key => $value) {
+            if ($value['isDisplayYear'] === 1) continue;
+            if ((int)($value['year']) < $year) {
+                $list[$key]['isDisplayYear'] = 1;
+                $year = (int)($value['year']);
+            } else {
+                $list[$key]['isDisplayYear'] = 0;
+            }
+        }
+
+        return [
+            'list'  => $list  ?: [],
+            'count' => $count ?: 0,
         ];
     }
 

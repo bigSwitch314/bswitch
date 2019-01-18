@@ -23,10 +23,12 @@ class Label extends Common
         try {
             $param = $this->param;
             $name  = $param['name'];
+            $size  = $param['size'];
 
             check_string($name);
+            check_number($size);
 
-            $status = (new LabelService())->save($id=0, $name);
+            $status = (new LabelService())->save($id=0, $name, $size);
             if (false === $status) {
                 throw new \Exception('添加失败！', FAIL);
             }
@@ -53,11 +55,12 @@ class Label extends Common
             $param = $this->param;
             $id    = $param['id'];
             $name  = $param['name'];
+            $size  = $param['size'];
 
-            check_number($id);
+            check_number($id, $size);
             check_string($name);
 
-            $status = (new LabelService())->save($id, $name);
+            $status = (new LabelService())->save($id, $name, $size);
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);
             }
@@ -129,6 +132,58 @@ class Label extends Common
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
                 'errmsg'  => '删除成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 所有标签统计
+     */
+    public function getAllLabelStats()
+    {
+        try {
+
+            $data = (new LabelService())->getAllLabelStats();
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 根据标签查文章
+     */
+    public function getArticleByLabel()
+    {
+        try {
+            $param = $this->param;
+            $id    = $param['id'];
+            $page_no   = $param['page_no'];
+            $page_size = $param['page_size'];
+
+            check_number([$id, $page_no, $page_size]);
+
+            $data = (new LabelService())->getArticleByLabel($id, $page_no, $page_size);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data ?: [],
             ]);
 
         } catch (\Exception $e) {

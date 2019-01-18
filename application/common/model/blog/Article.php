@@ -23,7 +23,7 @@ class Article extends Common
     {
         $map['ar.id']     = $id;
         $map['ar.delete'] = 0;
-        $fields = 'ar.id, ar.title, ar.category_id, group_concat(al.label_id) as label_ids, ar.content_md, ar.content_html, ar.read_number, ar.release, 
+        $fields = 'ar.id, ar.title, ar.category_id, group_concat(al.label_id) as label_ids, ar.content_md, ar.content_html, ar.read_number, ar.type, ar.release, 
                    from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
 
         return $this
@@ -45,8 +45,8 @@ class Article extends Common
      */
     public function getArticleList($map, $page_no, $page_size)
     {
-        $fields = 'ar.id, ar.title, left(content_html, 130) as content, ar.category_id, ca.name as category_name ,ifnull(group_concat(la.name), "—") as label_name, ar.read_number, ar.release, 
-                   from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
+        $fields = 'ar.id, ar.title, left(content_html, 130) as content, ar.category_id, ca.name as category_name ,ifnull(group_concat(la.name), "—") as label_name, ar.read_number,
+                   ar.type, ar.release,from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
         $order  = 'ar.create_time desc';
 
         $count = $this

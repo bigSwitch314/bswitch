@@ -25,6 +25,7 @@ class Article extends Common
             $title        = $param['title'];
             $category_id  = $param['category_id'];
             $label_ids    = $param['label_ids'];
+            $type         = $param['type'];
             $release      = $param['release'];
             $content_md   = $param['content_md'];
             $content_html = $param['content_html'];
@@ -32,12 +33,14 @@ class Article extends Common
             check_string([$title, $content_md, $content_html]);
             check_number($category_id);
             check_string($label_ids, false);
+            check_number_range($type, [1, 2, 3, 4]);
             check_number_range($release, [0, 1]);
 
             $status = (new ArticleService())->save($id=0,
                 $title,
                 $category_id,
                 $label_ids,
+                $type,
                 $release,
                 $content_md,
                 $content_html);
@@ -70,6 +73,7 @@ class Article extends Common
             $title        = $param['title'];
             $category_id  = $param['category_id'];
             $label_ids    = $param['label_ids'];
+            $type         = $param['type'];
             $release      = $param['release'];
             $content_md   = $param['content_md'];
             $content_html = $param['content_html'];
@@ -77,12 +81,14 @@ class Article extends Common
             check_string([$title, $content_md, $content_html]);
             check_number($category_id);
             check_string($label_ids, false);
+            check_number_range($type, [1, 2, 3, 4]);
             check_number_range($release, [0, 1]);
 
             $status = (new ArticleService())->save($id,
                 $title,
                 $category_id,
                 $label_ids,
+                $type,
                 $release,
                 $content_md,
                 $content_html);
@@ -118,11 +124,13 @@ class Article extends Common
             $end_time    = $param['end_time'];
             $category_id = $param['category_id'];
             $label_ids   = $param['label_ids'];
+            $type        = $param['type'];
             $back_ground = $param['back_ground'] ?: 0;
 
             check_number([$id, $page_no, $page_size, $category_id], false);
             check_date([$begin_time, $end_time], false);
             check_string([$title, $label_ids], false);
+            check_number_range($type, [1, 2, 3, 4], false);
 
             $result = (new ArticleService())->get($id,
                 $page_no,
@@ -132,6 +140,7 @@ class Article extends Common
                 $end_time,
                 $category_id,
                 $label_ids,
+                $type,
                 $back_ground);
 
             $this->ajaxReturn([
@@ -227,6 +236,34 @@ class Article extends Common
             check_number($id);
 
             $result = (new ArticleService())->getDetial($id);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $result ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 文章归档（前台）
+     */
+    public function getArchive()
+    {
+        try {
+            $param     = $this->param;
+            $page_no   = $param['page_no'];
+            $page_size = $param['page_size'];
+
+            check_number($page_no, $page_size);
+
+            $result = (new ArticleService())->getArchive($page_no, $page_size);
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
