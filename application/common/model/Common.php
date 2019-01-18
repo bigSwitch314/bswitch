@@ -8,15 +8,16 @@
 
 namespace app\common\model;
 
-use think\model;
+use think\Model;
 
-class Common extends model
+class Common extends Model
 {
     /**
      * 查询单条记录
      * @param array $where
      * @param array $fields
-     * @return mixed
+     * @return array|false|
+     * @throws \think\exception\DbException
      */
     public function getOneData($where = [], $fields = [])
     {
