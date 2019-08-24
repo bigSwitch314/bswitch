@@ -22,4 +22,5 @@ define('CONF_PATH', __DIR__.'/config/');
 // 定义公共文件目录
 define('COMM_PATH', __DIR__ . '/application/common/');
 // 加载框架引导文件
+//debug('1111');
 require __DIR__ . '/thinkphp/start.php';

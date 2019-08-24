@@ -98,10 +98,12 @@ class Common extends Model
      * @param $where
      * @param $field
      * @return mixed
+     * @throws \think\exception\DbException
      */
     public function getDataField($where, $field)
     {
-        return $this->where($where)->getField($field);
+        $result = $this->where($where)->find();
+        return $result[$field];
     }
 
     /**
