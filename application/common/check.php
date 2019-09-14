@@ -59,6 +59,28 @@ function check_number_range($param, $arr, $must = true) {
 }
 
 /**
+ * 至少有一个参数验证
+ * @param mixed ...$param
+ * @return bool
+ * @throws Exception
+ */
+function check_has_one(...$param) {
+    $has_one = [];
+    array_map(function($value) use (&$has_one) {
+        if ((empty($value) && 0 !== $value && '0' !== $value)) {
+            $has_one[] = 0;
+        } else {
+            $has_one[] = 1;
+        }
+    }, $param);
+
+    if (array_sum($has_one) === 0 ) {
+        throw new \Exception('参数错误！', PARAM_ERROR);
+    }
+    return true;
+}
+
+/**
  * 字符类型验证
  * @param $param
  * @param bool $must

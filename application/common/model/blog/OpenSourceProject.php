@@ -29,12 +29,12 @@ class OpenSourceProject extends Common
         $order  = 'osp.create_time desc';
 
         $count = $this
-            ->alias('ops')
+            ->alias('osp')
             ->where($map)
             ->count();
 
         $list = $this
-            ->alias('ops')
+            ->alias('osp')
             ->where($map)
             ->field($fields)
             ->order($order)
@@ -45,6 +45,26 @@ class OpenSourceProject extends Common
             'count' => $count,
             'list'  => $list
         ];
+    }
+
+    /**
+     * 开源项目详情）
+     * @param $id
+     * @return false
+     * @throws \think\exception\DbException
+     */
+    public function getDetail($id)
+    {
+        $map['osp.id'] = $id;
+        $map['osp.delete'] = 0;
+        $fields = 'osp.id, osp.name, osp.level, osp.url, osp.version, osp.release, from_unixtime(osp.create_time, \'%Y-%m-%d %H:%i\') as create_time,
+                   if(osp.edit_time, from_unixtime(osp.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
+
+        return $this
+            ->alias('osp')
+            ->where($map)
+            ->field($fields)
+            ->find();
     }
 
 }

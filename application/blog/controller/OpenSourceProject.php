@@ -16,8 +16,8 @@ class OpenSourceProject extends Common
     }
 
     /**
-     * 添加记录
-     */
+ * 添加记录
+ */
     public function add()
     {
         try {
@@ -200,6 +200,153 @@ class OpenSourceProject extends Common
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
                 'errmsg'  => '修改成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 添加记录
+     */
+    public function addUpdateLog()
+    {
+        try {
+            $param   = $this->param;
+            $osp_id  = $param['osp_id'];
+            $version = $param['version'];
+            $content = $param['content'];
+
+            check_number($osp_id);
+            check_string($version);
+            check_string($content);
+
+            $status = (new OpenSourceProjectService())->saveUpdateLog(
+                $id=0,
+                $osp_id,
+                $version,
+                $content);
+
+            if (false === $status) {
+                throw new \Exception('添加失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '添加成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 修改记录
+     */
+    public function editUpdateLog()
+    {
+        try {
+            $param   = $this->param;
+            $id      = $param['id'];
+            $osp_id  = $param['osp_id'];
+            $version = $param['version'];
+            $content = $param['content'];
+
+            check_number($id);
+            check_number($osp_id);
+            check_string($version);
+            check_string($content);
+
+            $status = (new OpenSourceProjectService())->saveUpdateLog(
+                $id,
+                $osp_id,
+                $version,
+                $content);
+            if (false === $status) {
+                throw new \Exception('编辑失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '编辑成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 获取记录
+     */
+    public function getUpdateLog()
+    {
+        try {
+            $param     = $this->param;
+            $id        = $param['id'];
+            $osp_id    = $param['osp_id'];
+            $page_no   = $param['page_no'];
+            $page_size = $param['page_size'];
+
+            check_number([$id, $osp_id, $page_no, $page_size], false);
+            check_has_one($id, $osp_id);
+
+            $result = (new OpenSourceProjectService())->getUpdateLog(
+                $id,
+                $osp_id,
+                $page_no,
+                $page_size);
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $result ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 删除记录
+     */
+    public function deleteUpdateLog()
+    {
+        try {
+            $param = $this->param;
+            $id    = $param['id'];
+
+            if (false === strpos($id, ',')) {
+                check_number($id, true);
+            } else {
+                $id = array_filter(explode(',', $id));
+                check_not_null($id);
+            }
+
+            $status = (new OpenSourceProjectService())->deleteUpdateLog($id);
+
+            if (false === $status) {
+                throw new \Exception('删除失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '删除成功!',
             ]);
 
         } catch (\Exception $e) {
