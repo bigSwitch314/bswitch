@@ -21,14 +21,16 @@ class OpenSourceProject extends Common
     public function add()
     {
         try {
-            $param   = $this->param;
-            $name    = $param['name'];
-            $level   = $param['level'];
-            $url     = $param['url'];
-            $version = $param['version'];
-            $release = $param['release'];
+            $param        = $this->param;
+            $name         = $param['name'];
+            $level        = $param['level'];
+            $url          = $param['url'];
+            $version      = $param['version'];
+            $introduction = $param['introduction'];
+            $release      = $param['release'];
 
             check_string([$name, $url, $version]);
+            check_string($introduction, false);
             check_number_range($level, [1, 2, 3]);
             check_number_range($release, [0, 1]);
 
@@ -38,6 +40,7 @@ class OpenSourceProject extends Common
                 $level,
                 $url,
                 $version,
+                $introduction,
                 $release);
 
             if (false === $status) {
@@ -63,13 +66,14 @@ class OpenSourceProject extends Common
     public function edit()
     {
         try {
-            $param   = $this->param;
-            $id      = $param['id'];
-            $name    = $param['name'];
-            $level   = $param['level'];
-            $url     = $param['url'];
-            $version = $param['version'];
-            $release = $param['release'];
+            $param        = $this->param;
+            $id           = $param['id'];
+            $name         = $param['name'];
+            $level        = $param['level'];
+            $url          = $param['url'];
+            $version      = $param['version'];
+            $introduction = $param['introduction'];
+            $release      = $param['release'];
 
             check_string([$name, $url, $version]);
             check_number_range($level, [1, 2, 3]);
@@ -82,6 +86,7 @@ class OpenSourceProject extends Common
                 $level,
                 $url,
                 $version,
+                $introduction,
                 $release);
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);
@@ -216,19 +221,22 @@ class OpenSourceProject extends Common
     public function addUpdateLog()
     {
         try {
-            $param   = $this->param;
-            $osp_id  = $param['osp_id'];
-            $version = $param['version'];
-            $content = $param['content'];
+            $param       = $this->param;
+            $osp_id      = $param['osp_id'];
+            $version     = $param['version'];
+            $create_time = $param['create_time'];
+            $content     = $param['content'];
 
             check_number($osp_id);
             check_string($version);
             check_string($content);
+            check_date($create_time);
 
             $status = (new OpenSourceProjectService())->saveUpdateLog(
                 $id=0,
                 $osp_id,
                 $version,
+                $create_time,
                 $content);
 
             if (false === $status) {
@@ -254,21 +262,24 @@ class OpenSourceProject extends Common
     public function editUpdateLog()
     {
         try {
-            $param   = $this->param;
-            $id      = $param['id'];
-            $osp_id  = $param['osp_id'];
-            $version = $param['version'];
-            $content = $param['content'];
+            $param       = $this->param;
+            $id          = $param['id'];
+            $osp_id      = $param['osp_id'];
+            $version     = $param['version'];
+            $create_time = $param['create_time'];
+            $content     = $param['content'];
 
             check_number($id);
             check_number($osp_id);
             check_string($version);
+            check_date($create_time);
             check_string($content);
 
             $status = (new OpenSourceProjectService())->saveUpdateLog(
                 $id,
                 $osp_id,
                 $version,
+                $create_time,
                 $content);
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);

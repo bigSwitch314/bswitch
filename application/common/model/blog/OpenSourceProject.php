@@ -24,7 +24,7 @@ class OpenSourceProject extends Common
      */
     public function getList($map, $page_no, $page_size)
     {
-        $fields = 'osp.id, osp.name, osp.level, osp.url, osp.version, osp.release, from_unixtime(osp.create_time, \'%Y-%m-%d %H:%i\') as create_time,
+        $fields = 'osp.id, osp.name, osp.level, osp.url, osp.version, osp.introduction, osp.release, from_unixtime(osp.create_time, \'%Y-%m-%d %H:%i\') as create_time,
                    if(osp.edit_time, from_unixtime(osp.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
         $order  = 'osp.create_time desc';
 
@@ -57,7 +57,7 @@ class OpenSourceProject extends Common
     {
         $map['osp.id'] = $id;
         $map['osp.delete'] = 0;
-        $fields = 'osp.id, osp.name, osp.level, osp.url, osp.version, osp.release, from_unixtime(osp.create_time, \'%Y-%m-%d %H:%i\') as create_time,
+        $fields = 'osp.id, osp.name, osp.level, osp.url, osp.version, osp.introduction, osp.release, from_unixtime(osp.create_time, \'%Y-%m-%d %H:%i\') as create_time,
                    if(osp.edit_time, from_unixtime(osp.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
 
         return $this

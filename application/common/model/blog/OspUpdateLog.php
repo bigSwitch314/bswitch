@@ -24,7 +24,7 @@ class OspUpdateLog extends Common
      */
     public function getList($map, $page_no, $page_size)
     {
-        $fields = 'id, osp_id, version, content, from_unixtime(create_time, \'%Y-%m-%d %H:%i\') as create_time';
+        $fields = 'id, osp_id, version, content, from_unixtime(create_time, \'%Y-%m-%d\') as create_time';
         $order  = 'create_time desc';
 
         $count = $this->where($map)->count();

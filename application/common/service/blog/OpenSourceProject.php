@@ -63,6 +63,7 @@ class OpenSourceProject
      * @param $level
      * @param $url
      * @param $version
+     * @param $introduction
      * @param $release
      * @return bool
      * @throws \think\exception\DbException
@@ -72,6 +73,7 @@ class OpenSourceProject
                          $level,
                          $url,
                          $version,
+                         $introduction,
                          $release)
     {
         //  项目名称不能重名
@@ -85,11 +87,12 @@ class OpenSourceProject
         unset($map);
 
         // 入库数据
-        $data['name']    = $name;
-        $data['level']   = $level;
-        $data['url']     = $url;
-        $data['version'] = $version;
-        $data['release'] = $release;
+        $data['name']         = $name;
+        $data['level']        = $level;
+        $data['url']          = $url;
+        $data['version']      = $version;
+        $data['introduction'] = $introduction;
+        $data['release']      = $release;
 
         // 使用事务闭包
         Db::transaction(function() use($id, $data) {
@@ -133,7 +136,7 @@ class OpenSourceProject
             $xx_time = $time_type == 1 ? 'osp.create_time' : 'osp.edit_time';
             if ($begin_time) $map[$xx_time]   = ['gt', $begin_time];
             if ($end_time)   $map[$xx_time]   = ['lt', $end_time];
-            if ($name)       $map['osp.name'] = ['like', "%name%"];
+            if ($name)       $map['osp.name'] = ['like', "%$name%"];
             $map['osp.delete'] = 0;
             $articles  = $this->getOpenSourceProjectModel()->getList($map, $page_no, $page_size);
 
@@ -178,18 +181,21 @@ class OpenSourceProject
      * @param int $id
      * @param $osp_id
      * @param $version
+     * @param $create_time
      * @param $content
      * @return bool
      */
     public function saveUpdateLog($id=0,
                                   $osp_id,
                                   $version,
+                                  $create_time,
                                   $content)
     {
         // 入库数据
-        $data['osp_id']  = $osp_id;
-        $data['version'] = $version;
-        $data['content'] = implode('#', $content);
+        $data['osp_id']      = $osp_id;
+        $data['version']     = $version;
+        $data['create_time'] = strtotime($create_time);
+        $data['content']     = implode('#', $content);
 
         // 使用事务闭包
         Db::transaction(function() use($id, $data) {
@@ -198,7 +204,6 @@ class OpenSourceProject
                 $data['edit_time'] = time();
                 $this->getOspUpdateLogModel()->updateData($map, $data);
             } else {
-                $data['create_time'] = time();
                 $this->getOspUpdateLogModel()->addOneData($data);
             }
         });
