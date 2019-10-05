@@ -135,10 +135,12 @@ class Label
 
     /**
      * 根据标签查文章
+     *
      * @param $id
      * @param $page_no
      * @param $page_size
      * @return array
+     * @throws \think\exception\DbException
      */
     public function getArticleByLabel($id, $page_no, $page_size)
     {
