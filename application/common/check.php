@@ -197,3 +197,37 @@ function check_date($date, $must = true) {
     }
     return true;
 }
+
+/**
+ * 列表验证
+ *
+ * @param $list
+ * @param $key
+ * @param bool $must
+ * @return bool
+ * @throws Exception
+ */
+function check_list($list, $key, $must = true) {
+    if (empty($list) && true == $must) {
+        throw new Exception("  参数错误！", PARAM_ERROR);
+    }
+    if (empty($list) && false == $must) {
+        return true;
+    }
+
+    if (is_array($list) && is_array($key)) {
+        array_map(function($value) use ($key) {
+            $keys = array_keys($value);
+            for ($i = 0; $i < count($key); $i++) {
+                if (!in_array($key[$i], $keys)) {
+                    throw new Exception("  参数错误！", PARAM_ERROR);
+                }
+            }
+            return true;
+        }, $list);
+    } else {
+        throw new Exception("  参数错误！", PARAM_ERROR);
+    }
+
+    return true;
+}

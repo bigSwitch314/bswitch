@@ -552,19 +552,26 @@ function get_subs($category, $id=0) {
 
 /**
  * 无限极分类，生成树（引用）
+ *
  * @param $list
  * @param int $root
+ * @return mixed
  */
 function generate_tree($list, $root=0) {
     $tree = [];
     $list = array_column($list, null, 'id');
     foreach ($list as $key => $value) {
+        if (!$list[$key]['children']) {
+            $list[$key]['children'] = [];
+        }
+
         if ($root == $value['pid']) {
             $tree[] = &$list[$key];
         } else {
-            $list[$value['pid']]['son'][] = &$list[$key];
+            $list[$value['pid']]['children'][] = &$list[$key];
         }
     }
+    return $tree;
 }
 
 /**
@@ -581,7 +588,7 @@ function generate_tree2($list, $pid = 0) {
                 'id'   => $val['id'],
                 'name' => $val['name'],
                 'pid'  => $val['pid'],
-                'son'  => generate_tree2($list, $val['id'])
+                'children'  => generate_tree2($list, $val['id'])
             ];
         }
     }

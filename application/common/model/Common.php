@@ -84,6 +84,18 @@ class Common extends Model
     }
 
     /**
+     * 批量更新
+     *
+     * @param $list
+     * @return array|false
+     * @throws \Exception
+     */
+    public function batchUpdateData($list)
+    {
+        return $this->saveAll($list);
+    }
+
+    /**
      * 删除记录
      * @param $where
      * @return int|mixed
