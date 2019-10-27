@@ -9,6 +9,7 @@
 namespace app\common\service\blog;
 
 use app\common\model\blog\Menu as MenuModel;
+use Vpc\Request\V20160428\EnableVpcClassicLinkRequest;
 
 
 class Menu
@@ -91,7 +92,6 @@ class Menu
             if ($list) {
                 $tree = $this->generate_tree($list);
                 $tree = $this->sort_tree($tree);
-                dump($tree);die;
                 $tree = $this->generate_serial_number($tree);
             }
             $result['tree'] = $tree;

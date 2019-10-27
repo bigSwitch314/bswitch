@@ -16,13 +16,13 @@ class Menu extends Common
     public function getList()
     {
         $map['m.delete'] = 0;
-        $fields = 'm.id, m.name, m.sort, m.pid, m.create_time, ifnull(m2.name, \'顶级\') as pName';
+        $fields = 'm.id, m.name, m.sort, m2.delete, m.pid, m.create_time, m2.delete as m2delete, ifnull(m2.name, \'顶级\') as pName';
 
         return $this
             ->alias('m')
             ->where($map)
             ->field($fields)
-            ->join('bs_menu m2', "m2.id=m.pid", 'left')
+            ->join('bs_menu m2', "m2.delete = 0 and m2.id=m.pid", 'left')
             ->select();
     }
 
