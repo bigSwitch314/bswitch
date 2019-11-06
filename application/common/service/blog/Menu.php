@@ -91,10 +91,12 @@ class Menu
             $tree = [];
             if ($list) {
                 $tree = $this->generate_tree($list);
-                $tree = $this->sort_tree($tree);
-                $tree = $this->generate_serial_number($tree);
+                if ($tree) {
+                    $tree = $this->sort_tree($tree);
+                    $tree = $this->generate_serial_number($tree);
+                }
             }
-            $result['tree'] = $tree;
+            $result['tree'] = $tree ?: [];
             $result['list'] = $list;
         }
         return $result;

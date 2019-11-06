@@ -16,7 +16,8 @@ class Menu extends Common
     public function getList()
     {
         $map['m.delete'] = 0;
-        $fields = 'm.id, m.name, m.sort, m2.delete, m.pid, m.create_time, m2.delete as m2delete, ifnull(m2.name, \'顶级\') as pName';
+//        $map['m2.delete'] = 0;
+        $fields = 'm.id, m.name, m.sort, m.pid, m.create_time, ifnull(m2.name, \'顶级\') as pName';
 
         return $this
             ->alias('m')
