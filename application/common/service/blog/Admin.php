@@ -9,6 +9,8 @@
 namespace app\common\service\blog;
 
 use app\common\model\blog\Admin as AdminModel;
+use app\common\model\blog\AccountRole as AccountRoleModel;
+use think\Db;
 
 
 class Admin
@@ -19,11 +21,27 @@ class Admin
     public $AdminModel;
 
     /**
+     * @var AccountRoleModel
+     */
+    public $AccountRoleModel;
+
+    /**
      * Admin constructor
      */
     public function __construct()
     {
 
+    }
+
+    /**
+     * getAccountRoleModel
+     */
+    public function getAccountRoleModel()
+    {
+        if(empty($this->AccountRoleModel)) {
+            $this->AccountRoleModel = new AccountRoleModel();
+        }
+        return $this->AccountRoleModel;
     }
 
     /**
@@ -44,6 +62,7 @@ class Admin
      * @param $password
      * @param $email
      * @param $status
+     * @param $roles
      * @return bool|false|int|mixed
      * @throws \Exception
      */
@@ -51,7 +70,8 @@ class Admin
                          $username,
                          $password,
                          $email,
-                         $status)
+                         $status,
+                         $roles)
     {
         // 名称不能重名
         if ($id) $map['id'] = ['neq', $id];
@@ -68,18 +88,33 @@ class Admin
             'email'     => $email,
             'status'    => $status
         ];
-        if ($id) {
-            if (empty($password)) {
-                unset($data['password']);
+
+        // 使用事务闭包
+        Db::transaction(function() use($id, $data, $roles) {
+            if ($id) {
+                if (empty($password)) {
+                    unset($data['password']);
+                }
+                unset($map);
+                $map['id'] = $id;
+                $data['edit_time'] = time();
+                $this->getAdminModel()->updateData($map, $data);
+            } else {
+                $data['create_time'] = time();
+                $id = $this->getAdminModel()->addOneData($data);
             }
-            unset($map);
-            $map['id'] = $id;
-            $data['edit_time'] = time();
-            return $this->getAdminModel()->updateData($map, $data);
-        } else {
-            $data['create_time'] = time();
-            return $this->getAdminModel()->addOneData($data);
-        }
+
+            $this->getAccountRoleModel()->deleteData(['admin_id' => $id]);
+            $role_data = array_map(function($value) use($id) {
+                return [
+                    'role_id' => $value,
+                    'admin_id' => $id,
+                ];
+            }, $roles);
+            $this->getAccountRoleModel()->addMultiData($role_data);
+        });
+
+        return true;
     }
 
     /**
@@ -107,6 +142,32 @@ class Admin
                 $order,
                 $page_no,
                 $page_size);
+
+            if (100 == $page_size) {
+               $list = array_map(function($value) {
+                   return [
+                       'id' => $value['id'],
+                       'username' => $value['username'],
+                   ];
+               }, (array)$list);
+            }
+
+            // 关联角色
+            $roles = [];
+            $admin_ids = array_column((array)$list, 'id');
+            if ($admin_ids) {
+                // 关联账号
+                $role_arr = $this->getAdminModel()->getRoleByAdminIds($admin_ids);
+                foreach ($role_arr as $key => $value) {
+                    $roles[$value['admin_id']][] = [
+                        'id' => $value['role_id'],
+                        'name' => $value['name'],
+                    ];
+                }
+            }
+            array_walk($list, function(&$value) use($roles) {
+                $value['roles'] = $roles[$value['id']] ?: [];
+            });
 
             $count = $this->getAdminModel()->getDataCount($map);
 

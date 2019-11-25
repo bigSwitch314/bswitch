@@ -9,7 +9,6 @@
 namespace app\common\service\blog;
 
 use app\common\model\blog\Menu as MenuModel;
-use Vpc\Request\V20160428\EnableVpcClassicLinkRequest;
 
 
 class Menu

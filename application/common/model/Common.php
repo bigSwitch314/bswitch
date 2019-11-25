@@ -168,4 +168,30 @@ class Common extends Model
             ->where($where)
             ->count();
     }
+
+    /**
+     * 删除指定表记录
+     * @param $table
+     * @param $where
+     * @return int|mixed
+     */
+    public function deleteTableData($table, $where)
+    {
+        return $this
+            ->table($table)
+            ->where($where)
+            ->delete();
+    }
+
+    /**
+     * 添加多条记录
+     * @param $table
+     * @param $data
+     * @return array|false
+     * @throws \Exception
+     */
+    public function addTableMultiData($table, $data)
+    {
+        return $this->table($table)->saveAll($data);
+    }
 }

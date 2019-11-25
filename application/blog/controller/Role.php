@@ -2,13 +2,13 @@
 namespace app\blog\controller;
 
 use app\common\controller\Common;
-use app\common\service\blog\Admin as AdminService;
+use app\common\service\blog\Role as RoleService;
 
 
-class Admin extends Common
+class Role extends Common
 {
     /**
-     * Admin constructor.
+     * Role constructor.
      */
     public function __construct()
     {
@@ -21,24 +21,21 @@ class Admin extends Common
     public function add()
     {
         try {
-            $param    = $this->param;
-            $username = $param['username'];
-            $password = $param['password'];
-            $email    = $param['email'];
-            $status   = $param['status'];
-            $roles    = $param['roles'];
+            $param  = $this->param;
+            $name   = $param['name'];
+            $status = $param['status'];
+            $nodes  = $param['nodes'];
 
-            check_string([$username, $password]);
+            check_string($name);
             check_number_range($status, [0, 1]);
-            check_email($email);
-            check_number($roles);
+            check_number($nodes);
 
-            $status = (new AdminService())->save($id=0,
-                $username,
-                $password,
-                $email,
+            $status = (new RoleService())->save(
+                $id=0,
+                $name,
                 $status,
-                $roles);
+                $nodes);
+
             if (false === $status) {
                 throw new \Exception('添加失败！', FAIL);
             }
@@ -62,27 +59,23 @@ class Admin extends Common
     public function edit()
     {
         try {
-            $param    = $this->param;
-            $id       = $param['id'];
-            $username = $param['username'];
-            $password = $param['password'];
-            $email    = $param['email'];
-            $status   = $param['status'];
-            $roles    = $param['roles'];
+            $param  = $this->param;
+            $id     = $param['id'];
+            $name   = $param['name'];
+            $status = $param['status'];
+            $nodes  = $param['nodes'];
 
             check_number($id);
-            check_string($username);
-            check_string($password, false);
-            check_email($email);
-            check_number_range($status,[0, 1]);
-            check_number($roles);
+            check_string($name);
+            check_number_range($status, [0, 1]);
+            check_number($nodes);
 
-            $status = (new AdminService())->save($id,
-                $username,
-                $password,
-                $email,
+            $status = (new RoleService())->save(
+                $id,
+                $name,
                 $status,
-                $roles);
+                $nodes);
+
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);
             }
@@ -106,14 +99,14 @@ class Admin extends Common
     public function get()
     {
         try {
-            $param = $this->param;
-            $id    = $param['id'];
+            $param     = $this->param;
+            $id        = $param['id'];
             $page_no   = $param['page_no'];
             $page_size = $param['page_size'];
 
-            check_number([$id, $page_no, $page_size], false);
+            check_number([$id, $page_no], false);
 
-            $result = (new AdminService())->get($id, $page_no, $page_size);
+            $result = (new RoleService())->get($id, $page_no, $page_size);
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
@@ -145,7 +138,7 @@ class Admin extends Common
                 check_not_null($id);
             }
 
-            $status = (new AdminService())->delete($id);
+            $status = (new RoleService())->delete($id);
 
             if (false === $status) {
                 throw new \Exception('删除失败！', FAIL);
@@ -165,7 +158,7 @@ class Admin extends Common
     }
 
     /**
-     * 修改账号状态
+     * 修改角色状态
      */
     public function changeStatus()
     {
@@ -177,7 +170,7 @@ class Admin extends Common
             check_number($id);
             check_number($status, [0, 1]);
 
-            $status = (new AdminService())->changeStatus($id, $status);
+            $status = (new RoleService())->changeStatus($id, $status);
 
             if (false === $status) {
                 throw new \Exception('修改失败！', FAIL);
@@ -195,6 +188,60 @@ class Admin extends Common
             ]);
         }
     }
+
+    /**
+     * 获取菜单节点树
+     */
+    public function getMenuNodeTree()
+    {
+        try {
+            $result = (new RoleService())->getMenuNodeTree();
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $result ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * 绑定账号
+     */
+    public function bindAccount()
+    {
+        try {
+            $param       = $this->param;
+            $role_id     = $param['role_id'];
+            $account_ids = $param['account_ids'];
+
+            check_number($role_id);
+            check_number($account_ids);
+            $status = (new RoleService())->bindAccount($role_id, $account_ids);
+
+            if (false === $status) {
+                throw new \Exception('绑定失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '绑定成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
 
 }
 
