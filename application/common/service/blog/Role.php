@@ -160,7 +160,16 @@ class Role
                 $table = 'bs_role_node';
                 $where['role_id'] = ['in', $role_ids];
                 $fields = 'node_id, role_id';
-                $access = $this->getRoleModel()->getTableMultiData($table, $where, $fields);
+                $order = 'id asc';
+                $page_no = 1;
+                $page_size = 10000;
+                $access = $this->getRoleModel()->getTableMultiData(
+                    $table,
+                    $where,
+                    $fields,
+                    $order,
+                    $page_no,
+                    $page_size);
                 foreach ($access as $key => $value) {
                     $nodes[$value['role_id']][] = $value['node_id'];
                 }

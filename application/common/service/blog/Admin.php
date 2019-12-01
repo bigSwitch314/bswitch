@@ -206,4 +206,37 @@ class Admin
         return $this->getAdminModel()->updateData($map, $data);
     }
 
+    /**
+     * 登录
+     *
+     * @param $username
+     * @param $password
+     * @param $valid_code
+     * @return int
+     * @throws \think\exception\DbException
+     */
+    public function login($username, $password, $valid_code)
+    {
+        $map['username'] = $username;
+        $map['password'] = $password;
+
+        $result = $this->getAdminModel()->getOneData($map);
+        $state = 1;
+        if (null == $result) $state = 2;
+        return $state;
+    }
+
+    /**
+     * 退出
+     *
+     * @param $username
+     * @param $password
+     * @return int
+     * @throws \think\exception\DbException
+     */
+    public function logout($username, $password)
+    {
+        return true;
+    }
+
 }

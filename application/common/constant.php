@@ -17,3 +17,12 @@ define('FAIL', 40002);
 
 // 网络错误
 define('DB_ERROR', 40003);
+
+// 账号或密码错误
+define('LOGIN_PASSWORD_ERROR', 40004);
+
+// 验证码错误
+define('LOGIN_CODE_ERROR', 40005);
+
+// 验证码过期
+define('LOGIN_CODE_EXPIRE', 40006);
