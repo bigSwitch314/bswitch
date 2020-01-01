@@ -184,7 +184,7 @@ return [
         // SESSION_ID的提交变量，解决flash上传跨域
         'var_session_id' => '',
         // SESSION前缀
-        'prefix'         => 'think',
+        'prefix'         => '',
         // 是否自动开启SESSION
         'auto_start'     => true,
         // sessionkey前缀

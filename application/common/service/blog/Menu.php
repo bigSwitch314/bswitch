@@ -162,13 +162,12 @@ class Menu
         $sort = array_column($tree, 'sort');
         array_multisort($sort, SORT_ASC, $tree);
         foreach ($tree as &$value) {
-            if (count($value['children']) > 1) {
+            if (count((array)$value['children']) > 1) {
                 $sort = array_column($value['children'], 'sort');
                 array_multisort($sort, SORT_ASC, $value['children']);
             }
 
         }
-        unset($value);
 
         return $tree;
     }

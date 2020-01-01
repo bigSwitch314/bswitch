@@ -22,7 +22,10 @@ define('DB_ERROR', 40003);
 define('LOGIN_PASSWORD_ERROR', 40004);
 
 // 验证码错误
-define('LOGIN_CODE_ERROR', 40005);
+define('VERIFY_CODE_ERROR', 40005);
 
 // 验证码过期
-define('LOGIN_CODE_EXPIRE', 40006);
+define('VERIFY_CODE_EXPIRE', 40006);
+
+// 验证码为空
+define('VERIFY_CODE_EMPTY', 40007);
