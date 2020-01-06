@@ -211,19 +211,15 @@ class Admin
      *
      * @param $username
      * @param $password
-     * @param $valid_code
-     * @return int
+     * @return array|false
      * @throws \think\exception\DbException
      */
-    public function login($username, $password, $valid_code)
+    public function login($username, $password)
     {
         $map['username'] = $username;
         $map['password'] = $password;
 
-        $result = $this->getAdminModel()->getOneData($map);
-        $state = 1;
-        if (null == $result) $state = 2;
-        return $state;
+        return $this->getAdminModel()->getOneData($map);
     }
 
     /**

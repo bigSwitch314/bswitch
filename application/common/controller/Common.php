@@ -24,7 +24,7 @@ class Common extends Controller
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, authKey, sessionId, token, cache-control, pragma");
         header("Access-Control-Max-Age: 600");
         // 解析token
-        //$this->ParseToken();
+        $this->ParseToken();
     }
 
     /**
@@ -36,33 +36,34 @@ class Common extends Controller
             if (!isset($_SERVER['HTTP_TOKEN'])) {
                 throw new \Exception("请求错误,token不存在", PARAM_ERROR);
             }
-            $tokenStr = str_replace('Bearer ', '', $_SERVER['HTTP_TOKEN']);
+            $tokenStr = $_SERVER['HTTP_TOKEN'];
             if (!$tokenStr) {
                 throw new \Exception("请求错误，token为空", PARAM_ERROR);
             }
             //尝试解密
             $token = (array)JWT::decode($tokenStr, Config::get('encode_key'), ['HS256']);
             $this->user_id = $token['data']->user_id;
+            $this->user_name = $token['data']->username;
 
         } catch (\DomainException $e) {
-            $ret['errormsg'] = $e->getMessage();
-            $ret['errorcode'] = 90;
+            $ret['errmsg'] = $e->getMessage();
+            $ret['errcode'] = 90;
             $this->ajaxReturn($ret);
         } catch (\InvalidArgumentException $e) {
-            $ret['errormsg'] = $e->getMessage();
-            $ret['errorcode'] = 91;
+            $ret['errmsg'] = $e->getMessage();
+            $ret['errcode'] = 91;
             $this->ajaxReturn($ret);
         } catch (\UnexpectedValueException $e) {
-            $ret['errormsg'] = $e->getMessage();
-            $ret['errorcode'] = 92;
+            $ret['errmsg'] = $e->getMessage();
+            $ret['errcode'] = 92;
             $this->ajaxReturn($ret);
         } catch (\DateTime $e) {
-            $ret['errormsg'] = $e->getMessage();
-            $ret['errorcode'] = 93;
+            $ret['errmsg'] = $e->getMessage();
+            $ret['errcode'] = 93;
             $this->ajaxReturn($ret);
         } catch (\Exception $e) {
-            $ret['errormsg'] = $e->getMessage();
-            $ret['errorcode'] = $e->getCode();
+            $ret['errmsg'] = $e->getMessage();
+            $ret['errcode'] = $e->getCode();
             $this->ajaxReturn($ret);
         }
     }
