@@ -33,15 +33,12 @@ class Common extends Controller
     public function ParseToken()
     {
         try {
-            if (!isset($_SERVER['HTTP_TOKEN'])) {
-                throw new \Exception("请求错误,token不存在", PARAM_ERROR);
-            }
-            $tokenStr = $_SERVER['HTTP_TOKEN'];
-            if (!$tokenStr) {
-                throw new \Exception("请求错误，token为空", PARAM_ERROR);
+            $token = $_SERVER['HTTP_TOKEN'];
+            if (!isset($token) || !$token) {
+                throw new \Exception("token错误", TOKEN_ERROR);
             }
             //尝试解密
-            $token = (array)JWT::decode($tokenStr, Config::get('encode_key'), ['HS256']);
+            $token = (array)JWT::decode($token, Config::get('encode_key'), ['HS256']);
             $this->user_id = $token['data']->user_id;
             $this->user_name = $token['data']->username;
 

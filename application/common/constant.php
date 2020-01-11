@@ -9,6 +9,9 @@
 // 查询成功
 define('SUCCESS', 0);
 
+// token错误
+define('TOKEN_ERROR', 40000);
+
 // 参数错误
 define('PARAM_ERROR', 40001);
 
