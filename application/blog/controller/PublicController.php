@@ -6,6 +6,7 @@ use think\captcha\Captcha;
 use Firebase\JWT\JWT;
 use think\Config;
 use think\Controller;
+use think\Response;
 
 
 class PublicController extends Controller
@@ -22,6 +23,11 @@ class PublicController extends Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, authKey, sessionId, token, cache-control, pragma");
         header("Access-Control-Max-Age: 600");
+        // 跨域返回
+        $method = $this->request->method();
+        if (strtoupper($method) == 'OPTIONS') {
+            return Response::create()->send();
+        }
     }
 
     /**
