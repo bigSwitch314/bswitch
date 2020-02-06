@@ -131,6 +131,7 @@ class Article
      * @param $category_id
      * @param $label_ids
      * @param $type
+     * @param $time_type
      * @param $back_ground
      * @return array|false
      * @throws \think\exception\DbException
@@ -144,6 +145,7 @@ class Article
                         $category_id,
                         $label_ids,
                         $type,
+                        $time_type,
                         $back_ground)
     {
         if ($id) {
@@ -155,14 +157,20 @@ class Article
                 $val = (int)$val;
             });
         } else {
+            $map['ar.delete'] = 0;
             if ($title)              $map['ar.title']       = ['like', "%$title%"];
-            if ($begin_time)         $map['ar.create_time'] = ['gt', $begin_time];
-            if ($end_time)           $map['ar.create_time'] = ['gt', $end_time];
             if ($label_ids)          $map['al.label_id']    = ['in', $label_ids];
             if ($type)               $map['type']           = $type;
             if ($category_id)        $map['ar.category_id'] = $category_id;
             if (empty($back_ground)) $map['ar.release']     = 1;
-            $map['ar.delete'] = 0;
+
+            if ($begin_time && $end_time) {
+                $begin_time = strtotime($begin_time);
+                $end_time   = strtotime($end_time) + 24*60*60 -1;
+                $time_key = $time_type == 1 ? 'ar.create_time' : 'ar.edit_time';
+                $map[$time_key] = [['gt', $begin_time], ['lt', $end_time]];
+            }
+
             $articles  = $this->getArticleModel()->getArticleList($map, $page_no, $page_size);
 
             // 标签搜索，则重写列表中的label_name

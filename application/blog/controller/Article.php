@@ -125,12 +125,13 @@ class Article extends Common
             $category_id = $param['category_id'];
             $label_ids   = $param['label_ids'];
             $type        = $param['type'];
+            $time_type   = $param['time_type'];
             $back_ground = $param['back_ground'] ?: 0;
 
             check_number([$id, $page_no, $page_size, $category_id], false);
             check_date([$begin_time, $end_time], false);
             check_string([$title, $label_ids], false);
-            check_number_range($type, [1, 2, 3, 4], false);
+            check_number_range($type, [1, 2], false);
 
             $result = (new ArticleService())->get($id,
                 $page_no,
@@ -141,6 +142,7 @@ class Article extends Common
                 $category_id,
                 $label_ids,
                 $type,
+                $time_type,
                 $back_ground);
 
             $this->ajaxReturn([
