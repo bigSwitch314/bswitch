@@ -197,6 +197,8 @@ class Article
                     }
                     $value['content'] = $value['content'] . ' ...';
                 }
+                // 标签逗号分隔加空隔
+                $value['label_name'] = str_replace(',', ', ', $value['label_name']);
             });
 
             $result = [

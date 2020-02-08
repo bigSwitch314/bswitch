@@ -44,7 +44,7 @@ class TransshipmentArticle extends Common
      */
     public function getArticleList($map, $page_no, $page_size)
     {
-        $fields = 'tr.id, tr.title, tr.author, tr.link, tr.release, from_unixtime(tr.create_time, \'%Y-%m-%d %H:%i\') as create_time,
+        $fields = 'tr.id, tr.title, tr.author, tr.link, tr.release, from_unixtime(tr.create_time, \'%Y-%m-%d\') as create_time,
                    if(tr.edit_time, from_unixtime(tr.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
         $order  = 'tr.create_time desc';
 

@@ -133,10 +133,13 @@ class OpenSourceProject
         if ($id) {
             $result = $this->getOpenSourceProjectModel()->getDetail($id);
         } else {
-            $xx_time = $time_type == 1 ? 'osp.create_time' : 'osp.edit_time';
-            if ($begin_time) $map[$xx_time]   = ['gt', $begin_time];
-            if ($end_time)   $map[$xx_time]   = ['lt', $end_time];
-            if ($name)       $map['osp.name'] = ['like', "%$name%"];
+            if ($name) $map['osp.name'] = ['like', "%$name%"];
+            if ($begin_time && $end_time) {
+                $begin_time = strtotime($begin_time);
+                $end_time   = strtotime($end_time) + 24*60*60 -1;
+                $time_key = $time_type == 1 ? 'osp.create_time' : 'osp.edit_time';
+                $map[$time_key] = [['gt', $begin_time], ['lt', $end_time]];
+            }
             $map['osp.delete'] = 0;
             $articles  = $this->getOpenSourceProjectModel()->getList($map, $page_no, $page_size);
 
@@ -184,6 +187,7 @@ class OpenSourceProject
      * @param $create_time
      * @param $content
      * @return bool
+     * @throws \think\exception\DbException
      */
     public function saveUpdateLog($id=0,
                                   $osp_id,
@@ -191,6 +195,15 @@ class OpenSourceProject
                                   $create_time,
                                   $content)
     {
+        $map['osp_id'] = ['neq', $osp_id];
+        $map['version'] = $version;
+        $map['delete'] = 0;
+        $result = $this->getOspUpdateLogModel()->getList($map, 1, 5);
+        if ($result['list']) {
+            throw new \Exception('版本名称重复！', FAIL);
+        }
+        unset($map);
+
         // 入库数据
         $data['osp_id']      = $osp_id;
         $data['version']     = $version;

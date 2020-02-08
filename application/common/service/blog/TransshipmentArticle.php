@@ -114,6 +114,7 @@ class TransshipmentArticle
      * @param $title
      * @param $begin_time
      * @param $end_time
+     * @param $time_type
      * @param $back_ground
      * @return array|false
      * @throws \think\exception\DbException
@@ -124,14 +125,19 @@ class TransshipmentArticle
                         $title,
                         $begin_time,
                         $end_time,
+                        $time_type,
                         $back_ground)
     {
         if ($id) {
             $result = $this->getArticleTransshipmentModel()->getArticleDetail($id);
         } else {
             if ($title)              $map['tr.title']       = ['like', "%$title%"];
-            if ($begin_time)         $map['tr.create_time'] = ['gt', $begin_time];
-            if ($end_time)           $map['tr.create_time'] = ['gt', $end_time];
+            if ($begin_time && $end_time) {
+                $begin_time = strtotime($begin_time);
+                $end_time   = strtotime($end_time) + 24*60*60 -1;
+                $time_key = $time_type == 1 ? 'tr.create_time' : 'tr.edit_time';
+                $map[$time_key] = [['gt', $begin_time], ['lt', $end_time]];
+            }
             // if (empty($back_ground)) $map['tr.release']     = 1;
             $map['tr.delete'] = 0;
             $articles  = $this->getArticleTransshipmentModel()->getArticleList($map, $page_no, $page_size);

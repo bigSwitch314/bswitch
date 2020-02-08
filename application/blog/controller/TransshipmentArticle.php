@@ -111,11 +111,13 @@ class TransshipmentArticle extends Common
             $title       = $param['title'];
             $begin_time  = $param['begin_time'];
             $end_time    = $param['end_time'];
+            $time_type   = $param['time_type'];
             $back_ground = $param['back_ground'] ?: 0;
 
             check_number([$id, $page_no, $page_size], false);
             check_date([$begin_time, $end_time], false);
             check_string([$title], false);
+            check_number_range($time_type, [1, 2], false);
 
             $result = (new TransshipmentArticleService())->get(
                 $id,
@@ -124,6 +126,7 @@ class TransshipmentArticle extends Common
                 $title,
                 $begin_time,
                 $end_time,
+                $time_type,
                 $back_ground);
 
             $this->ajaxReturn([
