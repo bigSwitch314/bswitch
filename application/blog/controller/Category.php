@@ -23,10 +23,12 @@ class cateGory extends Common
         try {
             $param = $this->param;
             $name  = $param['name'];
+            $pid   = $param['pid'];
 
             check_string($name);
+            check_number($pid);
 
-            $status = (new CategoryService())->save($id=0, $name);
+            $status = (new CategoryService())->save($id=0, $name, $pid);
             if (false === $status) {
                 throw new \Exception('添加失败！', FAIL);
             }
@@ -53,11 +55,12 @@ class cateGory extends Common
             $param = $this->param;
             $id    = $param['id'];
             $name  = $param['name'];
+            $pid   = $param['pid'];
 
-            check_number($id);
+            check_number([$id, $pid]);
             check_string($name);
 
-            $status = (new CategoryService())->save($id, $name);
+            $status = (new CategoryService())->save($id, $name, $pid);
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);
             }
@@ -115,20 +118,24 @@ class cateGory extends Common
 
             if (false === strpos($id, ',')) {
                 check_number($id, true);
+                $id = [$id];
             } else {
                 $id = array_filter(explode(',', $id));
                 check_not_null($id);
             }
 
-            $status = (new CategoryService())->delete($id);
+            $result = (new CategoryService())->delete($id);
 
-            if (false === $status) {
+            if (false === $result['status']) {
                 throw new \Exception('删除失败！', FAIL);
             }
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
-                'errmsg'  => '删除成功!',
+                'errmsg'  => '删除成功！',
+                'data' => [
+                    'not_delete_category' => $result['not_delete_category']
+                ]
             ]);
 
         } catch (\Exception $e) {
@@ -189,6 +196,30 @@ class cateGory extends Common
                 'errmsg'  => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * 获取一级分类
+     */
+    public function getLevelOneCategory()
+    {
+        try {
+
+            $data = (new CategoryService())->getLevelOneCategory();
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $data ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+
     }
 
 

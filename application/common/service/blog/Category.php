@@ -41,10 +41,11 @@ class Category
      * 添加/修改记录
      * @param $id
      * @param $name
+     * @param $pid
      * @return bool|false|int|mixed
      * @throws \Exception
      */
-    public function save($id, $name)
+    public function save($id, $name, $pid)
     {
         // 名称不能重名
         if ($id) $map['id'] = ['neq', $id];
@@ -56,6 +57,7 @@ class Category
         }
         // 添加/修改
         $data['name'] = $name;
+        $data['pid']  = $pid;
         if ($id) {
             unset($map);
             $map['id'] = $id;
@@ -82,36 +84,48 @@ class Category
             $map['delete'] = 0;
             $result = $this->getCategoryModel()->getOneData(['id' => $id]);
         } else {
-            $map['delete'] = 0;
-            $fields = 'id, name, from_unixtime(create_time, \'%Y-%m-%d %H:%i\') as create_time';
-            $order  = 'create_time desc';
-            $list = $this->getCategoryModel()->getMultiData($map,
-                $fields,
-                $order,
-                $page_no,
-                $page_size);
-
-            $count = $this->getCategoryModel()->getDataCount($map);
-
+            $map['ca.delete'] = 0;
+            $list = $this->getCategoryModel()->getCategoryList($map, $page_no, $page_size);
             $result = [
-                'list' => $list ?: [],
-                'count' => $count ?: 0
+                'list'  => $list['list']  ?: [],
+                'count' => $list['count'] ?: 0
             ];
         }
+
         return $result;
     }
 
     /**
      * 删除记录
+     *
      * @param $id
-     * @return mixed
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function delete($id)
     {
-        $map['id'] = ['in', $id];
-        $data['delete'] = 1;
-        $data['edit_time'] = time();
-        return $this->getCategoryModel()->updateData($map, $data);
+        $status = true;
+        $names = [];
+        $category_children = $this->getCategoryModel()->getCategoryChildren($id);
+        if ($category_children) {
+            $ids = array_column((array)$category_children, 'id');
+            $names = array_column((array)$category_children, 'name');
+            $id = array_diff($id, $ids);
+        }
+
+        if ($id) {
+            $map['id'] = ['in', $id];
+            $data['delete'] = 1;
+            $data['edit_time'] = time();
+            $status = $this->getCategoryModel()->updateData($map, $data);
+        }
+
+        return [
+            'status' => $status,
+            'not_delete_category'  => $names,
+        ];
     }
 
     /**
@@ -125,6 +139,25 @@ class Category
             'list'  => $result,
             'count' => count($result)
         ];
+    }
+
+    /**
+     * 获取一级分类
+     *
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getLevelOneCategory()
+    {
+        $map['pid']    = ['eq', 0];
+        $map['delete'] = 0;
+        $fields = 'id, name';
+        $result = $this->getCategoryModel()->getMultiData($map, $fields);
+        return [
+            'list'  => $result,
+            'count' => count((array)$result),
+        ];
+
     }
 
     /**
