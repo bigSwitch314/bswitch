@@ -9,6 +9,7 @@
 namespace app\common\service\blog;
 
 use app\common\model\blog\Label as LabelModel;
+use app\common\service\blog\Article as ArticleService;
 
 
 class Label
@@ -17,6 +18,11 @@ class Label
      * @var LabelModel
      */
     public $LabelModel;
+
+    /**
+     * @var ArticleService
+     */
+    public $ArticleService;
 
     /**
      * Label constructor
@@ -35,6 +41,17 @@ class Label
             $this->LabelModel = new LabelModel();
         }
         return $this->LabelModel;
+    }
+
+    /**
+     * getArticleService
+     */
+    public function getArticleService()
+    {
+        if(empty($this->ArticleService)) {
+            $this->ArticleService = new ArticleService();
+        }
+        return $this->ArticleService;
     }
 
     /**
@@ -86,7 +103,7 @@ class Label
             $result['size'] = (string)$result['size'];
         } else {
             $map['delete'] = 0;
-            $fields = 'id, name, size, from_unixtime(create_time, \'%Y-%m-%d %H:%i\') as create_time';
+            $fields = 'id, name, size, from_unixtime(create_time, \'%Y-%m-%d\') as create_time';
             $order  = 'create_time desc';
             $list = $this->getLabelModel()->getMultiData($map,
                 $fields,
@@ -95,6 +112,14 @@ class Label
                 $page_size);
 
             $count = $this->getLabelModel()->getDataCount($map);
+
+            $stat = $this->getArticleService()->getStatByLabel();
+            array_walk($list, function(&$value) use($stat) {
+                $value['article_number'] = 0;
+                if(array_key_exists($value['id'], $stat)) {
+                    $value['article_number'] = $stat[$value['id']];
+                }
+            });
 
             $result = [
                 'list' => $list ?: [],

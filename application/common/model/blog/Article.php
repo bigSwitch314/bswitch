@@ -114,4 +114,39 @@ class Article extends Common
         return $this->query($sql_nex . ' union ' . $sql_pre);
     }
 
+    /**
+     * 根据分类统计文章
+     *
+     * @throws \think\exception\DbException
+     */
+    public function getStatByCategory()
+    {
+        $map['ar.delete'] = 0;
+        $fields = 'ar.category_id, ca.pid as category_pid, count(ar.id) as article_number';
+
+        return $this
+            ->alias('ar')
+            ->where($map)
+            ->field($fields)
+            ->join('bs_category ca', 'ca.id=ar.category_id and ca.delete=0', 'left')
+            ->group('ar.category_id')
+            ->select();
+    }
+
+    /**
+     * 根据标签统计文章
+     *
+     * @throws \think\exception\DbException
+     */
+    public function getStatByLabel()
+    {
+        $map['delete'] = 0;
+        $fields = 'label_ids';
+
+        return $this
+            ->where($map)
+            ->field($fields)
+            ->select();
+    }
+
 }

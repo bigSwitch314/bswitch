@@ -195,10 +195,12 @@ class OpenSourceProject
                                   $create_time,
                                   $content)
     {
-        $map['osp_id'] = ['neq', $osp_id];
+        $map['id']      = ['neq', $id];
+        $map['osp_id']  = ['eq', $osp_id];
         $map['version'] = $version;
-        $map['delete'] = 0;
+        $map['delete']  = 0;
         $result = $this->getOspUpdateLogModel()->getList($map, 1, 5);
+//        dump($result);die;
         if ($result['list']) {
             throw new \Exception('版本名称重复！', FAIL);
         }

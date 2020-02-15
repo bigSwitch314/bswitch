@@ -9,6 +9,7 @@
 namespace app\common\service\blog;
 
 use app\common\model\blog\Category as CategoryModel;
+use app\common\service\blog\Article as ArticleService;
 
 
 class Category
@@ -17,6 +18,11 @@ class Category
      * @var CategoryModel
      */
     public $CategoryModel;
+
+    /**
+     * @var ArticleService
+     */
+    public $ArticleService;
 
     /**
      * Category constructor
@@ -35,6 +41,17 @@ class Category
             $this->CategoryModel = new CategoryModel();
         }
         return $this->CategoryModel;
+    }
+
+    /**
+     * getArticleService
+     */
+    public function getArticleService()
+    {
+        if(empty($this->ArticleService)) {
+            $this->ArticleService = new ArticleService();
+        }
+        return $this->ArticleService;
     }
 
     /**
@@ -85,10 +102,19 @@ class Category
             $result = $this->getCategoryModel()->getOneData(['id' => $id]);
         } else {
             $map['ca.delete'] = 0;
-            $list = $this->getCategoryModel()->getCategoryList($map, $page_no, $page_size);
+            $category_result = $this->getCategoryModel()->getCategoryList($map, $page_no, $page_size);
+
+            $stat = $this->getArticleService()->getStatByCategory();
+            array_walk($category_result['list'], function(&$value) use($stat) {
+                $value['article_number'] = 0;
+                if(array_key_exists($value['id'], $stat)) {
+                    $value['article_number'] = $stat[$value['id']]['article_number'];
+                }
+            });
+
             $result = [
-                'list'  => $list['list']  ?: [],
-                'count' => $list['count'] ?: 0
+                'list'  => $category_result['list']  ?: [],
+                'count' => $category_result['count'] ?: 0
             ];
         }
 

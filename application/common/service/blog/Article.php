@@ -313,4 +313,44 @@ class Article
         ];
     }
 
+    /**
+     * 根据分类统计文章
+     *
+     * @throws \think\exception\DbException
+     */
+    public function getStatByCategory()
+    {
+        $result = $this->getArticleModel()->getStatByCategory();
+        $temp = $result;
+        foreach ($result as $key => $value) {
+            foreach ($temp as $k => $v) {
+                if ($value['category_id'] == $v['category_pid']) {
+                    $result[$key]['article_number'] += $v['article_number'];
+                    unset($temp[$k]);
+                }
+            }
+        }
+        return array_column((array)$result, null, 'category_id');
+    }
+
+    /**
+     * 根据标签统计文章
+     *
+     * @throws \think\exception\DbException
+     */
+    public function getStatByLabel()
+    {
+        $result = $this->getArticleModel()->getStatByLabel();
+
+        $label_ids = [];
+        foreach ($result as $value) {
+            if ($value) {
+                $label_ids_arr  = explode(',', $value['label_ids']);
+                $label_ids = array_merge($label_ids, $label_ids_arr);
+            }
+        }
+
+        return array_count_values($label_ids);
+    }
+
 }
