@@ -85,7 +85,7 @@ class Role
         $map['name'] = $name;
         $result = $this->getRoleModel()->getOneData($map);
         if ($result) {
-            throw new \Exception('数据已存在！', FAIL);
+            throw new \Exception('角色名称重复！', FAIL);
         }
 
         // 添加/修改

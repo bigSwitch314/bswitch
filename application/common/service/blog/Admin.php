@@ -90,7 +90,7 @@ class Admin
         ];
 
         // 使用事务闭包
-        Db::transaction(function() use($id, $data, $roles) {
+        Db::transaction(function() use($id, $data, $roles, $password) {
             if ($id) {
                 if (empty($password)) {
                     unset($data['password']);
@@ -218,6 +218,7 @@ class Admin
     {
         $map['username'] = $username;
         $map['password'] = $password;
+        $map['delete'] = 0;
 
         return $this->getAdminModel()->getOneData($map);
     }
@@ -233,6 +234,20 @@ class Admin
     public function logout($username, $password)
     {
         return true;
+    }
+
+    /**
+     * 设置登录时间
+     *
+     * @param $username
+     * @return bool|false|int
+     */
+    public function setLoginTime($username)
+    {
+        $map['username'] = $username;
+        $data['last_login_time'] = time();
+        return $this->getAdminModel()->updateData($map, $data);
+
     }
 
 }

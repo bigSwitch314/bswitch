@@ -43,10 +43,15 @@ class PublicController extends Controller
 
             check_string([$username, $password]);
 
+            // 用户名密码校验
             $result = (new AdminService())->login($username, $password);
             if($result == null) {
                 throw new \Exception('账号或密码错误', LOGIN_PASSWORD_ERROR);
             }
+            if($result['status'] == 0) {
+                throw new \Exception('账号被禁用', ACCOUNT_FORBBIN);
+            }
+
 
             // 验证码校验
             $captcha = new Captcha();
@@ -60,6 +65,9 @@ class PublicController extends Controller
                     throw new \Exception('验证码不能为空！', VERIFY_CODE_EMPTY);
                 default:
             }
+
+            // 写入登录时间
+            (new AdminService())->setLoginTime($username);
 
             $key = Config::get('encode_key');
             $time = time(); //当前时间

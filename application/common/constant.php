@@ -32,3 +32,7 @@ define('VERIFY_CODE_EXPIRE', 40006);
 
 // 验证码为空
 define('VERIFY_CODE_EMPTY', 40007);
+
+// 账号被禁用
+define('ACCOUNT_FORBBIN', 40007);
+
