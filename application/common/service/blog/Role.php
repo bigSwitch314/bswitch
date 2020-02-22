@@ -225,6 +225,8 @@ class Role
         $node_level_1 = $this->getRoleModel()->getNodeLevel1();
 
         $table = 'bs_node';
+        $map['delete'] = 0;
+        $map['status'] = 1;
         $map['pid'] = ['neq', 0];
         $field = 'id, name, pid, 1 as sort';
         $order = 'id asc';
@@ -239,6 +241,7 @@ class Role
             $page_size);
 
         $table = 'bs_menu';
+        unset($map);
         $map['pid'] = 0;
         $field = '-1*id as id, name, pid, sort';
         $menu_level_1 = $this->getRoleModel()->getTableMultiData($table, $map, $field);

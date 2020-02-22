@@ -35,6 +35,7 @@ class Role extends Common
      public function getNodeLevel1()
      {
          $map['n.delete'] = 0;
+         $map['n.status'] = 1;
          $map['n.pid'] = 0;
          $field = 'n.id, n.name, -1*n.group_id as pid, ifnull(m.sort, 1000) as sort';
 

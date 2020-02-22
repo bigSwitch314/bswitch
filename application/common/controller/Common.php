@@ -48,9 +48,15 @@ class Common extends Controller
             $this->user_id = $token['data']->user_id;
             $this->user_name = $token['data']->username;
 
+        } catch (\Firebase\JWT\ExpiredException $e) {
+            $ret['errmsg'] = 'token过期';
+            $ret['errcode'] = TOKEN_EXPIRE;
+            $ret['data'] = [];
+            $this->ajaxReturn($ret);
         } catch (\DomainException $e) {
-            $ret['errmsg'] = $e->getMessage();
-            $ret['errcode'] = 90;
+            $ret['errmsg'] = 'token错误';
+            $ret['errcode'] = TOKEN_ERROR;
+            $ret['data'] = [];
             $this->ajaxReturn($ret);
         } catch (\InvalidArgumentException $e) {
             $ret['errmsg'] = $e->getMessage();

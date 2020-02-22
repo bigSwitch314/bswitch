@@ -9,6 +9,7 @@
 namespace app\common\service\blog;
 
 use app\common\model\blog\Node as NodeModel;
+use think\Db;
 
 
 class Node
@@ -48,7 +49,7 @@ class Node
      * @param $menu
      * @param $menu_id
      * @param $group_id
-     * @return bool|false|int|mixed
+     * @return bool|mixed
      * @throws \think\exception\DbException
      */
     public function save($id=0,
@@ -67,7 +68,7 @@ class Node
         $map['pid']    = $pid;
         $result = $this->getNodeModel()->getOneData($map);
         if ($result) {
-            throw new \Exception('数据已存在！', FAIL);
+            throw new \Exception('名称重复！', FAIL);
         }
         // 添加/修改
         $data['name']     = $name;
@@ -82,7 +83,17 @@ class Node
             unset($map);
             $map['id'] = $id;
             $data['edit_time'] = time();
-            return $this->getNodeModel()->updateData($map, $data);
+            // 使用事务闭包
+            Db::transaction(function() use($id, $map, $data) {
+                $this->getNodeModel()->updateData($map, $data);
+                // 同步更新子节点
+                $status = $data['status'];
+                if ($status == 0) {
+                    $sql = "UPDATE `bs_node`  SET `status` = $status WHERE  `pid` = $id AND `delete` = 0";
+                    $this->getNodeModel()->execute($sql);
+                }
+            });
+            return true;
         } else {
             $data['create_time'] = time();
             return $this->getNodeModel()->addOneData($data);

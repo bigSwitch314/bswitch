@@ -73,7 +73,7 @@ class PublicController extends Controller
             $time = time(); //当前时间
             $token = [
                 'nbf' => $time, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                'exp' => $time + 86400 * 7, //过期时间,这里设置7天
+                'exp' => $time + 3600*3, //过期时间,这里设置3小时
                 'data' => [ //自定义信息，不要定义敏感信息
                     'user_id'   => $result['id'],
                     'user_name' => $result['username'],

@@ -9,6 +9,9 @@
 // 查询成功
 define('SUCCESS', 0);
 
+// token过期
+define('TOKEN_EXPIRE', 44444);
+
 // token错误
 define('TOKEN_ERROR', 40000);
 
@@ -34,5 +37,7 @@ define('VERIFY_CODE_EXPIRE', 40006);
 define('VERIFY_CODE_EMPTY', 40007);
 
 // 账号被禁用
-define('ACCOUNT_FORBBIN', 40007);
+define('ACCOUNT_FORBBIN', 40008);
+
+
 
