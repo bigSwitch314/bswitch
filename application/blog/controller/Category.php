@@ -5,7 +5,7 @@ use app\common\controller\Common;
 use app\common\service\blog\Category as CategoryService;
 
 
-class cateGory extends Common
+class Category extends Common
 {
     /**
      * Admin constructor.
