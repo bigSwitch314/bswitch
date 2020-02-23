@@ -39,5 +39,10 @@ define('VERIFY_CODE_EMPTY', 40007);
 // 账号被禁用
 define('ACCOUNT_FORBBIN', 40008);
 
+// 原始密码错误
+define('OLD_PASSWORD_ERROR', 40009);
+
+
+
 
 

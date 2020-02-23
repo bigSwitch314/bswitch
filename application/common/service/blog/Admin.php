@@ -224,19 +224,6 @@ class Admin
     }
 
     /**
-     * 退出
-     *
-     * @param $username
-     * @param $password
-     * @return int
-     * @throws \think\exception\DbException
-     */
-    public function logout($username, $password)
-    {
-        return true;
-    }
-
-    /**
      * 设置登录时间
      *
      * @param $username
@@ -246,6 +233,33 @@ class Admin
     {
         $map['username'] = $username;
         $data['last_login_time'] = time();
+        return $this->getAdminModel()->updateData($map, $data);
+
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param $userid
+     * @param $old_password
+     * @param $new_password
+     * @return bool|false|int
+     * @throws \think\exception\DbException
+     * @throws \Exception
+     */
+    public function modifyPassword($userid, $old_password, $new_password)
+    {
+
+        $map['id'] = $userid;
+        $map['password'] = $old_password;
+        $result = $this->getAdminModel()->getOneData($map);
+        if (!$result) {
+            throw new \Exception('原始密码错误', OLD_PASSWORD_ERROR);
+        }
+
+        unset($map['password']);
+        $data['password'] = $new_password;
+        $data['edit_time'] = time();
         return $this->getAdminModel()->updateData($map, $data);
 
     }

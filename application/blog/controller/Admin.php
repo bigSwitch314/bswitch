@@ -196,6 +196,39 @@ class Admin extends Common
         }
     }
 
+    /**
+     * 修改密码
+     */
+    public function modifyPassword()
+    {
+        try {
+            $param        = $this->param;
+            $userid       = $param['userid'];
+            $old_password = $param['old_password'];
+            $new_password = $param['new_password'];
+
+            check_number($userid);
+            check_string([$old_password, $new_password]);
+
+            $status = (new AdminService())->modifyPassword($userid, $old_password, $new_password);
+
+            if (false === $status) {
+                throw new \Exception('修改失败！', FAIL);
+            }
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '修改成功!',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
 }
 
 
