@@ -353,4 +353,94 @@ class Article
         return array_count_values($label_ids);
     }
 
+    /**
+     * 获取记录
+     * @param $id
+     * @param $page_no
+     * @param $page_size
+     * @param $title
+     * @param $begin_time
+     * @param $end_time
+     * @param $category_id
+     * @param $label_ids
+     * @param $type
+     * @param $time_type
+     * @return array|false
+     * @throws \think\exception\DbException
+     */
+    public function getFg($id,
+                        $page_no,
+                        $page_size,
+                        $title,
+                        $begin_time,
+                        $end_time,
+                        $category_id,
+                        $label_ids,
+                        $type,
+                        $time_type)
+    {
+        if ($id) {
+            $map['id'] = $id;
+            $map['delete'] = 0;
+            $result = $this->getArticleModel()->getArticleDetailFg($id);
+            $result['label_ids'] = explode(',',  $result['label_ids']);
+            array_walk($result['label_ids'], function(&$val) {
+                $val = (int)$val;
+            });
+        } else {
+            $map['ar.delete']  = 0;
+            $map['ar.release'] = 1;
+            if ($title)              $map['ar.title']       = ['like', "%$title%"];
+            if ($label_ids)          $map['al.label_id']    = ['in', $label_ids];
+            if ($type)               $map['type']           = $type;
+            if ($category_id) {
+                $all_chd_id = $this->getArticleModel()->getAllChdId($category_id);
+                $map['ar.category_id'] = ['in', $all_chd_id];
+            }
+
+            if ($begin_time && $end_time) {
+                $begin_time = strtotime($begin_time);
+                $end_time   = strtotime($end_time) + 24*60*60 -1;
+                $time_key = $time_type == 1 ? 'ar.create_time' : 'ar.edit_time';
+                $map[$time_key] = [['gt', $begin_time], ['lt', $end_time]];
+            }
+
+            $articles  = $this->getArticleModel()->getArticleListFg($map, $page_no, $page_size);
+
+            // 标签搜索，则重写列表中的label_name
+            $article_ids = array_column((array)$articles['list'], 'id');
+            if ($article_ids && $label_ids) {
+                $label = $this->getArticleLabelModel()->getLabelName($article_ids);
+                $label = array_column((array)$label, null, 'article_id');
+                array_walk($articles['list'], function(&$value) use($label) {
+                    $value['label_name'] = $label[$value['id']]['label_name'];
+                    // 文字内容标签
+                    $value['content'] = strip_tags($value['content']);
+                });
+            }
+
+            // 列表处理
+            array_walk($articles['list'], function(&$value) {
+                $value['content'] = strip_tags($value['content']);
+                // 文字大于100个字符，去掉末尾标点，再在后面添加省略号
+                if (120 <= mb_strlen($value['content'], 'utf8')) {
+                    $char = ['、', '，', ',', '：', '。', ':', '!', '！', '?', '？','(', ')', '（', '）', '{', '}', '【', '】', '[', ']'];
+                    $last_char = mb_substr(trim($value['content']), mb_strlen($value['content'], 'utf8')-1, 1, 'utf8');
+                    if (in_array($last_char, $char)) {
+                        $value['content'] = mb_substr(trim($value['content']), 0, mb_strlen($value['content'], 'utf8')-1 ,'utf8');
+                    }
+                    $value['content'] = $value['content'] . ' ...';
+                }
+                // 标签逗号分隔加空隔
+                $value['label_name'] = str_replace(',', ', ', $value['label_name']);
+            });
+
+            $result = [
+                'list'  => $articles['list']  ?: [],
+                'count' => $articles['count'] ?: 0
+            ];
+        }
+        return $result;
+    }
+
 }

@@ -279,8 +279,8 @@ class Controller
             // 返回json数据格式
             case 'JSON' :
                 $data = (object)$data;
-                $str  = sprintf("route=%s\ttime_stat=%s\tmemory_stat=%s\t%s\terrcode=%s\terrmsg=%s",
-                    $route, $time_stat, $memory_stat, get_params(), $data->errcode, $data->errmsg);
+                $str  = sprintf("route=%s\ttime_stat=%s\tmemory_stat=%s\t%s\terrcode=%s\terrmsg=%s\tdata=%s",
+                    $route, $time_stat, $memory_stat, get_params(), $data->errcode, $data->errmsg, json_encode($data->data));
                 if (isset($data->log)) {
                     $str = $str . $data->log;
                     unset($data->log);
