@@ -159,8 +159,9 @@ class Article extends Common
     {
         $map['ar.id']     = $id;
         $map['ar.delete'] = 0;
-        $fields = 'ar.id, ar.title, ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id, group_concat(al.label_id) as label_ids, ar.content_md, ar.content_html, ar.read_number, ar.type, ar.release, 
-                   from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
+        $fields = 'ar.id, ar.title, ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id, group_concat(al.label_id) as label_ids, 
+                   ar.content_md, ar.content_html, ar.read_number, ar.type, ar.release, from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, group_concat(la.name) as label_names, 
+                   if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
 
         return $this
             ->alias('ar')
@@ -169,6 +170,7 @@ class Article extends Common
             ->join('bs_category ca', 'ca.id=ar.category_id and ca.delete=0', 'left')
             ->join('bs_category ca2', 'ca2.id=ca.pid and ca2.delete=0', 'left')
             ->join('bs_article_label al', "al.article_id=ar.id", 'left')
+            ->join('bs_label la', "la.id=al.label_id", 'left')
             ->group('ar.id')
             ->find();
     }

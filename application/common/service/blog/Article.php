@@ -114,6 +114,8 @@ class Article
                 });
                 $this->getArticleLabelModel()->deleteData(['article_id'=>$id]);
                 $this->getArticleLabelModel()->addMultiData($data_al);
+            } else {
+                $this->getArticleLabelModel()->deleteData(['article_id'=>$id]);
             }
         });
 
@@ -152,10 +154,14 @@ class Article
             $map['id'] = $id;
             $map['delete'] = 0;
             $result = $this->getArticleModel()->getArticleDetail($id);
-            $result['label_ids'] = explode(',',  $result['label_ids']);
-            array_walk($result['label_ids'], function(&$val) {
-                $val = (int)$val;
-            });
+            if ($result['label_ids']) {
+                $result['label_ids'] = explode(',',  $result['label_ids']);
+                array_walk($result['label_ids'], function(&$val) {
+                    $val = (int)$val;
+                });
+            } else {
+                $result['label_ids'] = [];
+            }
         } else {
             $map['ar.delete'] = 0;
             if ($title)              $map['ar.title']       = ['like', "%$title%"];
@@ -383,10 +389,24 @@ class Article
             $map['id'] = $id;
             $map['delete'] = 0;
             $result = $this->getArticleModel()->getArticleDetailFg($id);
-            $result['label_ids'] = explode(',',  $result['label_ids']);
-            array_walk($result['label_ids'], function(&$val) {
-                $val = (int)$val;
-            });
+            if ($result['label_ids']) {
+                $result['label_ids'] = explode(',',  $result['label_ids']);
+                array_walk($result['label_ids'], function(&$val) {
+                    $val = (int)$val;
+                });
+            } else {
+                $result['label_ids'] = [];
+            }
+
+            // 获取上一篇、下一篇文章
+            $pre_next = $this->getArticleModel()->getPreNextArticle($id);
+            foreach ($pre_next as $value) {
+                if (1 == $value['type']) $pre  = $value;
+                if (2 == $value['type']) $next = $value;
+            }
+            $result['pre']  = isset($pre)  ? $pre  : '';
+            $result['next'] = isset($next)  ? $next  : '';
+
         } else {
             $map['ar.delete']  = 0;
             $map['ar.release'] = 1;
@@ -409,7 +429,7 @@ class Article
 
             // 标签搜索，则重写列表中的label_name
             $article_ids = array_column((array)$articles['list'], 'id');
-            if ($article_ids && $label_ids) {
+            if ($article_ids) {
                 $label = $this->getArticleLabelModel()->getLabelName($article_ids);
                 $label = array_column((array)$label, null, 'article_id');
                 array_walk($articles['list'], function(&$value) use($label) {

@@ -64,33 +64,6 @@ class Article extends CommonNotToken
     }
 
     /**
-     * 文章详情（前台）
-     */
-    public function getDetail()
-    {
-        try {
-            $param = $this->param;
-            $id    = $param['id'];
-
-            check_number($id);
-
-            $result = (new ArticleService())->getDetial($id);
-
-            $this->ajaxReturn([
-                'errcode' => SUCCESS,
-                'errmsg'  => '获取成功!',
-                'data'    => $result ?: [],
-            ]);
-
-        } catch (\Exception $e) {
-            $this->ajaxReturn([
-                'errcode' => $e->getCode(),
-                'errmsg'  => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
      * 文章归档（前台）
      */
     public function getArchive()
