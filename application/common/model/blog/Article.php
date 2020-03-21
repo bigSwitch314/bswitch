@@ -122,7 +122,7 @@ class Article extends Common
     public function getStatByCategory()
     {
         $map['ar.delete'] = 0;
-        $fields = 'ar.category_id, ca.pid as category_pid, count(ar.id) as article_number';
+        $fields = 'ar.category_id, ca.name as category_name, ca.pid as category_pid, count(ar.id) as article_number';
 
         return $this
             ->alias('ar')

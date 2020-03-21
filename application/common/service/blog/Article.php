@@ -322,9 +322,11 @@ class Article
     /**
      * 根据分类统计文章
      *
+     * @param string $type
+     * @return array
      * @throws \think\exception\DbException
      */
-    public function getStatByCategory()
+    public function getStatByCategory($type='list')
     {
         $result = $this->getArticleModel()->getStatByCategory();
         $temp = $result;
@@ -336,6 +338,22 @@ class Article
                 }
             }
         }
+
+        if ($type == 'tree') {
+            // 字段名称修改
+            foreach ($result as $key => $value) {
+                $result[$key] = [
+                    'id' => $value['category_id'],
+                    'pid' => $value['category_pid'],
+                    'name' => $value['category_name'],
+                    'article_number' => $value['article_number'],
+                ];
+            }
+
+            // 树转换
+            return generate_tree($result);
+        }
+
         return array_column((array)$result, null, 'category_id');
     }
 

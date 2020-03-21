@@ -2,7 +2,8 @@
 namespace app\blog_fg\controller;
 
 use app\common\controller\CommonNotToken;
-use app\common\service\blog\Category as CategoryService;
+use app\common\service\blog\Article as ArticleService;
+
 
 
 class Category extends CommonNotToken
@@ -18,17 +19,10 @@ class Category extends CommonNotToken
     /**
      * 获取记录
      */
-    public function get()
+    public function getStat()
     {
         try {
-            $param = $this->param;
-            $id    = $param['id'];
-            $page_no   = $param['page_no'];
-            $page_size = $param['page_size'];
-
-            check_number([$id, $page_no, $page_size], false);
-
-            $result = (new CategoryService())->get($id, $page_no, $page_size);
+            $result = (new ArticleService())->getStatByCategory($type='tree');
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,
@@ -43,59 +37,6 @@ class Category extends CommonNotToken
             ]);
         }
     }
-
-    /**
-     * 所有分类统计
-     */
-    public function getAllCategoryStats()
-    {
-        try {
-
-            $data = (new CategoryService())->getAllCategoryStats();
-
-            $this->ajaxReturn([
-                'errcode' => SUCCESS,
-                'errmsg'  => '获取成功!',
-                'data'    => $data ?: [],
-            ]);
-
-        } catch (\Exception $e) {
-            $this->ajaxReturn([
-                'errcode' => $e->getCode(),
-                'errmsg'  => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
-     * 根据分类查文章
-     */
-    public function getArticleByCategory()
-    {
-        try {
-            $param = $this->param;
-            $id    = $param['id'];
-            $page_no   = $param['page_no'];
-            $page_size = $param['page_size'];
-
-            check_number([$id, $page_no, $page_size]);
-
-            $data = (new CategoryService())->getArticleByCategory($id, $page_no, $page_size);
-
-            $this->ajaxReturn([
-                'errcode' => SUCCESS,
-                'errmsg'  => '获取成功!',
-                'data'    => $data ?: [],
-            ]);
-
-        } catch (\Exception $e) {
-            $this->ajaxReturn([
-                'errcode' => $e->getCode(),
-                'errmsg'  => $e->getMessage()
-            ]);
-        }
-    }
-
 }
 
 
