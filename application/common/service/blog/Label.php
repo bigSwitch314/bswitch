@@ -149,13 +149,18 @@ class Label
      */
     public function getAllLabelStats()
     {
-        $sql = 'SELECT `id`, `name`, `size` FROM bs_label WHERE `delete`=0 ORDER BY convert(`name` USING gbk)';
+        $sql = 'SELECT `id`, `name` FROM bs_label WHERE `delete`=0 ORDER BY convert(`name` USING gbk)';
         $result = $this->getLabelModel()->query($sql);
 
-        return [
-            'list'  => $result,
-            'count' => is_array($result)? count($result) : 0
-        ];
+        $stat = $this->getArticleService()->getStatByLabel();
+        array_walk($result, function(&$value) use($stat) {
+            $value['article_number'] = 0;
+            if(array_key_exists($value['id'], $stat)) {
+                $value['article_number'] = $stat[$value['id']];
+            }
+        });
+
+        return $result;
     }
 
     /**
