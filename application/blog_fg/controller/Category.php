@@ -2,7 +2,7 @@
 namespace app\blog_fg\controller;
 
 use app\common\controller\CommonNotToken;
-use app\common\service\blog\Article as ArticleService;
+use app\common\service\blog\Category as CategoryService;
 
 
 
@@ -22,7 +22,7 @@ class Category extends CommonNotToken
     public function getStat()
     {
         try {
-            $result = (new ArticleService())->getStatByCategory($type='tree');
+            $result = (new CategoryService())->getStat();
 
             $this->ajaxReturn([
                 'errcode' => SUCCESS,

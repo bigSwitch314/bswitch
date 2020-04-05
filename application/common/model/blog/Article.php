@@ -141,11 +141,14 @@ class Article extends Common
     public function getStatByLabel()
     {
         $map['delete'] = 0;
-        $fields = 'label_ids';
+        $fields = 'label_id';
 
         return $this
+            ->table('bs_article_label')
+            ->alias('al')
             ->where($map)
             ->field($fields)
+            ->join('bs_article ar', 'ar.id=al.article_id and ar.delete=0 and ar.release=1', 'left')
             ->select();
     }
 
@@ -230,6 +233,21 @@ class Article extends Common
         $sql = "select id from bs_category where FIND_IN_SET(id, getAllChdID($id))";
         $result = $this->query($sql);
         return array_column($result, 'id');
+    }
+
+    /**
+     * 统计文章分类标签数量
+     *
+     * @return mixed
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function getAclStat()
+    {
+        $sql_article = "select count('id') as stat from bs_article where `delete`=0";
+        $sql_category = "select count('id') as stat from bs_category where `delete`=0";
+        $sql_label = "select count('id') as stat from bs_label where `delete`=0";
+        return $this->query($sql_article . ' union ' . $sql_category . ' union ' . $sql_label);
     }
 
 }

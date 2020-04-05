@@ -155,19 +155,6 @@ class Category
     }
 
     /**
-     * 所有分类统计
-     * @throws \think\exception\DbException
-     */
-    public function getAllCategoryStats()
-    {
-        $result = $this->getCategoryModel()->getAllCategoryStats();
-        return [
-            'list'  => $result,
-            'count' => count($result)
-        ];
-    }
-
-    /**
      * 获取一级分类
      *
      * @return array
@@ -183,7 +170,6 @@ class Category
             'list'  => $result,
             'count' => count((array)$result),
         ];
-
     }
 
     /**
@@ -220,4 +206,25 @@ class Category
         ];
     }
 
+    /**
+     * 分类统计(Fg)
+     *
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getStat()
+    {
+        $result = $this->getCategoryModel()->getStats();
+        $temp = $result;
+        foreach ($result as $key => $value) {
+            foreach ($temp as $k => $v) {
+                if ($value['id'] == $v['pid']) {
+                    $result[$key]['article_number'] += $v['article_number'];
+                    unset($temp[$k]);
+                }
+            }
+        }
+
+        return generate_tree($result);
+    }
 }

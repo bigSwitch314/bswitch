@@ -151,7 +151,6 @@ class Label
     {
         $sql = 'SELECT `id`, `name` FROM bs_label WHERE `delete`=0 ORDER BY convert(`name` USING gbk)';
         $result = $this->getLabelModel()->query($sql);
-
         $stat = $this->getArticleService()->getStatByLabel();
         array_walk($result, function(&$value) use($stat) {
             $value['article_number'] = 0;

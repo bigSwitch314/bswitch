@@ -147,29 +147,6 @@ class Category extends Common
     }
 
     /**
-     * 所有分类统计
-     */
-    public function getAllCategoryStats()
-    {
-        try {
-
-            $data = (new CategoryService())->getAllCategoryStats();
-
-            $this->ajaxReturn([
-                'errcode' => SUCCESS,
-                'errmsg'  => '获取成功!',
-                'data'    => $data ?: [],
-            ]);
-
-        } catch (\Exception $e) {
-            $this->ajaxReturn([
-                'errcode' => $e->getCode(),
-                'errmsg'  => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
      * 根据分类查文章
      */
     public function getArticleByCategory()

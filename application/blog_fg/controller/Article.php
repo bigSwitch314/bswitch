@@ -64,6 +64,28 @@ class Article extends CommonNotToken
     }
 
     /**
+     * 统计文章分类标签数量
+     */
+    public function getAclStat()
+    {
+        try {
+            $result = (new ArticleService())->getAclStat();
+
+            $this->ajaxReturn([
+                'errcode' => SUCCESS,
+                'errmsg'  => '获取成功!',
+                'data'    => $result ?: [],
+            ]);
+
+        } catch (\Exception $e) {
+            $this->ajaxReturn([
+                'errcode' => $e->getCode(),
+                'errmsg'  => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * 文章归档（前台）
      */
     public function getArchive()
@@ -90,6 +112,8 @@ class Article extends CommonNotToken
             ]);
         }
     }
+
+
 
 
 

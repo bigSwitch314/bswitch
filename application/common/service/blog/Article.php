@@ -322,11 +322,10 @@ class Article
     /**
      * 根据分类统计文章
      *
-     * @param string $type
      * @return array
      * @throws \think\exception\DbException
      */
-    public function getStatByCategory($type='list')
+    public function getStatByCategory()
     {
         $result = $this->getArticleModel()->getStatByCategory();
         $temp = $result;
@@ -338,22 +337,7 @@ class Article
                 }
             }
         }
-
-        if ($type == 'tree') {
-            // 字段名称修改
-            foreach ($result as $key => $value) {
-                $result[$key] = [
-                    'id' => $value['category_id'],
-                    'pid' => $value['category_pid'],
-                    'name' => $value['category_name'],
-                    'article_number' => $value['article_number'],
-                ];
-            }
-
-            // 树转换
-            return generate_tree($result);
-        }
-
+        
         return array_column((array)$result, null, 'category_id');
     }
 
@@ -365,15 +349,7 @@ class Article
     public function getStatByLabel()
     {
         $result = $this->getArticleModel()->getStatByLabel();
-
-        $label_ids = [];
-        foreach ($result as $value) {
-            if ($value) {
-                $label_ids_arr  = explode(',', $value['label_ids']);
-                $label_ids = array_merge($label_ids, $label_ids_arr);
-            }
-        }
-
+        $label_ids = array_column($result, 'label_id');
         return array_count_values($label_ids);
     }
 
@@ -479,6 +455,23 @@ class Article
             ];
         }
         return $result;
+    }
+
+    /**
+     * 统计文章分类标签数量
+     *
+     * @return mixed
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function getAclStat()
+    {
+        $result =  $this->getArticleModel()->getAclStat();
+        return [
+            'article_stat' => $result['0']['stat'],
+            'category_stat' => $result['1']['stat'],
+            'label_stat' => $result['2']['stat'],
+        ];
     }
 
 }
