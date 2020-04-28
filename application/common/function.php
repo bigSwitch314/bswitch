@@ -644,3 +644,25 @@ function get_params()
     return $params;
 }
 
+/**
+ * 格式化时间,显示刚刚、几分钟前、昨天、前天...
+ * @param $time
+ * @return string
+ */
+function get_time_ago($time){
+    $t=time()-$time;
+    $f=array(
+        '31536000'=>'年',
+        '2592000'=>'个月',
+        '86400'=>'天',
+        '3600'=>'小时',
+        '60'=>'分钟',
+        '1'=>'秒'
+    );
+    foreach ($f as $k=>$v)    {
+        if (0 !=$c=floor($t/(int)$k)) {
+            return $v === '秒' ? '刚刚' : $c.$v.'前';
+        }
+    }
+}
+

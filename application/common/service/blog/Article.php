@@ -288,33 +288,39 @@ class Article
      */
     public function getArchive($page_no, $page_size) {
         $map = [
-            'delete'  => 0,
-            'release' => 1,
+            'ar.delete'  => 0,
+            'ar.release' => 1,
         ];
-        $fields = 'id, title, from_unixtime(create_time, \'%m-%d\') as date, from_unixtime(create_time, \'%Y\') as year';
-        $order  = 'create_time desc';
 
-        $list = $this->getArticleModel()->getMultiData($map,
-            $fields,
-            $order,
-            $page_no,
-            $page_size);
-        $count = $this->getArticleModel()->getDataCount($map);
 
-        $list[0]['isDisplayYear'] = 1;
-        $year = (int)$list[0]['year'];
-        foreach ($list as $key => $value) {
-            if ($value['isDisplayYear'] === 1) continue;
-            if ((int)($value['year']) < $year) {
-                $list[$key]['isDisplayYear'] = 1;
-                $year = (int)($value['year']);
+
+        $result_temp= $this->getArticleModel()->getArchive($map, $page_no, $page_size);
+        $list = $result_temp['list'];
+        $count = $result_temp['count'];
+
+        $result = [];
+        $currentList = [];
+        $currentYear = (int)$list[0]['year'];
+        foreach ($list as $value) {
+            if ((int)($value['year']) == $currentYear) {
+                $currentList[] = $value;
             } else {
-                $list[$key]['isDisplayYear'] = 0;
+                $result[] = ([
+                    'year' => $currentYear,
+                    'list' => $currentList,
+                ]);
+                $currentList = [$value];
+                $currentYear = (int)($value['year']);
             }
         }
-
+        if ($currentList) {
+            $result[] = [
+                'year' => $currentYear,
+                'list' => $currentList,
+            ];
+        }
         return [
-            'list'  => $list  ?: [],
+            'list'  => $result,
             'count' => $count ?: 0,
         ];
     }
@@ -337,7 +343,7 @@ class Article
                 }
             }
         }
-        
+
         return array_column((array)$result, null, 'category_id');
     }
 
@@ -391,6 +397,8 @@ class Article
             } else {
                 $result['label_ids'] = [];
             }
+            // 时间处理
+            $result['create_time'] = get_time_ago($result['create_time']);
 
             // 获取上一篇、下一篇文章
             $pre_next = $this->getArticleModel()->getPreNextArticle($id);
@@ -447,6 +455,8 @@ class Article
                 }
                 // 标签逗号分隔加空隔
                 $value['label_name'] = str_replace(',', ', ', $value['label_name']);
+                // 时间处理
+                $value['create_time'] = get_time_ago($value['create_time']);
             });
 
             $result = [

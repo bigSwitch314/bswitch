@@ -163,7 +163,7 @@ class Article extends Common
         $map['ar.id']     = $id;
         $map['ar.delete'] = 0;
         $fields = 'ar.id, ar.title, ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id, group_concat(al.label_id) as label_ids, 
-                   ar.content_md, ar.content_html, ar.read_number, ar.type, ar.release, from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, group_concat(la.name) as label_names, 
+                   ar.content_md, ar.content_html, ar.read_number, ar.type, ar.release, ar.create_time, group_concat(la.name) as label_names, 
                    if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
 
         return $this
@@ -189,7 +189,7 @@ class Article extends Common
     public function getArticleListFg($map, $page_no, $page_size)
     {
         $fields = 'ar.id, ar.title, ar.content_html as content, ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id, ifnull(group_concat(la.name), "—") as label_name,
-                   ar.read_number, ar.type, ar.release,from_unixtime(ar.create_time, \'%Y-%m-%d\') as create_time, if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
+                   ar.read_number, ar.type, ar.release, ar.create_time';
         $order  = 'ar.create_time desc';
 
         $count = $this
@@ -244,10 +244,49 @@ class Article extends Common
      */
     public function getAclStat()
     {
-        $sql_article = "select count('id') as stat from bs_article where `delete`=0";
-        $sql_category = "select count('id') as stat from bs_category where `delete`=0";
-        $sql_label = "select count('id') as stat from bs_label where `delete`=0";
+        // 加type字段，防止相同stat值合并为一条
+        $sql_article = "select count('id') as stat, 1 as type from bs_article where `delete`=0";
+        $sql_category = "select count('id') as stat, 2 as type from bs_category where `delete`=0";
+        $sql_label = "select count('id') as stat, 3 as type from bs_label where `delete`=0";
         return $this->query($sql_article . ' union ' . $sql_category . ' union ' . $sql_label);
+    }
+
+    /**
+     * 文章列表（前台）
+     * @param $map
+     * @param $page_no
+     * @param $page_size
+     * @return array
+     * @throws \think\exception\DbException
+     */
+    public function getArchive($map, $page_no, $page_size)
+    {
+        $fields = 'ar.id, ar.title, from_unixtime(ar.create_time, \'%m-%d\') as date, from_unixtime(ar.create_time, \'%Y\') as year, 
+                   ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id';
+        $order  = 'ar.create_time desc';
+
+        $count = $this
+            ->alias('ar')
+            ->where($map)
+            ->join('bs_category ca', 'ca.id=ar.category_id and ca.delete=0', 'left')
+            ->group('ar.id')
+            ->count();
+
+        $list = $this
+            ->alias('ar')
+            ->where($map)
+            ->field($fields)
+            ->join('bs_category ca', 'ca.id=ar.category_id and ca.delete=0', 'left')
+            ->join('bs_category ca2', 'ca2.id=ca.pid and ca2.delete=0', 'left')
+            ->order($order)
+            ->group('ar.id')
+            ->page($page_no, $page_size)
+            ->select();
+
+        return [
+            'count' => $count,
+            'list'  => $list
+        ];
     }
 
 }
