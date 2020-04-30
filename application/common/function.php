@@ -617,8 +617,7 @@ function two_dim_array_unique($arr, $key=null) {
  * 获取请求参数
  * @return string
  */
-function get_params()
-{
+function get_params() {
     $params = '';
     $inputs = $_REQUEST;
     ksort($inputs, SORT_STRING);
@@ -649,7 +648,7 @@ function get_params()
  * @param $time
  * @return string
  */
-function get_time_ago($time){
+function get_time_ago($time) {
     $t=time()-$time;
     $f=array(
         '31536000'=>'年',
@@ -664,5 +663,16 @@ function get_time_ago($time){
             return $v === '秒' ? '刚刚' : $c.$v.'前';
         }
     }
+}
+
+//文章文字、阅读时间统计
+function count_words_read_time($post) {
+    $text_num = mb_strlen(preg_replace('/\s/','',html_entity_decode(strip_tags($post))),'UTF-8');
+    $read_time = ceil($text_num/400);
+
+    return [
+       'text_number' => $text_num,
+       'read_time' => $read_time . '分钟',
+    ];
 }
 

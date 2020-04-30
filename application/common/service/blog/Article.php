@@ -65,6 +65,7 @@ class Article
      * @param $release
      * @param $content_md
      * @param $content_html
+     * @param $word_number
      * @return bool|false|int|mixed
      */
     public function save($id,
@@ -74,7 +75,8 @@ class Article
                          $type,
                          $release,
                          $content_md,
-                         $content_html)
+                         $content_html,
+                         $word_number)
     {
         // 文章数据
         $data['title']        = $title;
@@ -84,6 +86,7 @@ class Article
         $data['release']      = $release;
         $data['content_md']   = $content_md;
         $data['content_html'] = $content_html;
+        $data['word_number']  = $word_number;
 
         // 文章标签关联数据
         $data_al = [];

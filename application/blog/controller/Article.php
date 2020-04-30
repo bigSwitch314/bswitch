@@ -29,9 +29,10 @@ class Article extends Common
             $release      = $param['release'];
             $content_md   = $param['content_md'];
             $content_html = $param['content_html'];
+            $word_number  = $param['word_number'];
 
             check_string([$title, $content_md, $content_html]);
-            check_number($category_id);
+            check_number($category_id, $word_number);
             check_string($label_ids, false);
             check_number_range($type, [1, 2, 3, 4]);
             check_number_range($release, [0, 1]);
@@ -43,7 +44,8 @@ class Article extends Common
                 $type,
                 $release,
                 $content_md,
-                $content_html);
+                $content_html,
+                $word_number);
 
             if (false === $status) {
                 throw new \Exception('添加失败！', FAIL);
@@ -77,9 +79,10 @@ class Article extends Common
             $release      = $param['release'];
             $content_md   = $param['content_md'];
             $content_html = $param['content_html'];
+            $word_number  = $param['word_number'];
 
             check_string([$title, $content_md, $content_html]);
-            check_number($category_id);
+            check_number($category_id, $word_number);
             check_string($label_ids, false);
             check_number_range($type, [1, 2, 3, 4]);
             check_number_range($release, [0, 1]);
@@ -91,7 +94,8 @@ class Article extends Common
                 $type,
                 $release,
                 $content_md,
-                $content_html);
+                $content_html,
+                $word_number);
             if (false === $status) {
                 throw new \Exception('编辑失败！', FAIL);
             }

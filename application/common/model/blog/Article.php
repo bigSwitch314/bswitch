@@ -163,7 +163,7 @@ class Article extends Common
         $map['ar.id']     = $id;
         $map['ar.delete'] = 0;
         $fields = 'ar.id, ar.title, ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id, group_concat(al.label_id) as label_ids, 
-                   ar.content_md, ar.content_html, ar.read_number, ar.type, ar.release, ar.create_time, group_concat(la.name) as label_names, 
+                   ar.content_md, ar.content_html, ar.read_number, ar.word_number, ar.type, ar.release, ar.create_time, group_concat(la.name) as label_names, 
                    if(ar.edit_time, from_unixtime(ar.edit_time, \'%Y-%m-%d\'), \'—\') as edit_time';
 
         return $this
@@ -189,7 +189,7 @@ class Article extends Common
     public function getArticleListFg($map, $page_no, $page_size)
     {
         $fields = 'ar.id, ar.title, ar.content_html as content, ar.category_id, ca.name as category_name, ifnull(ca2.name, "") as parent_category_name, ifnull(ca2.id, "") as parent_category_id, ifnull(group_concat(la.name), "—") as label_name,
-                   ar.read_number, ar.type, ar.release, ar.create_time';
+                   ar.read_number, ar.word_number, ar.type, ar.release, ar.create_time';
         $order  = 'ar.create_time desc';
 
         $count = $this
